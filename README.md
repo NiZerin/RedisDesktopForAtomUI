@@ -23,6 +23,48 @@ dotnet run --project src/RedisDesktop.App
 
 连接配置与侧栏宽度保存在 `%AppData%/RedisDesktopForAtomUI/`。密码、SSH 口令使用 Windows DPAPI 加密，不会以明文写入 `connections.json`。导入导出的密文仅在同一台 Windows 用户下可解密。设置中可切换中/英界面，以及亮色 / 暗色 / 跟随系统主题。可填写 DB 别名，显示在连接名称旁。
 
+## 打包发布
+
+需要 [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)。下面生成 **Windows x64 自包含单文件**，对方电脑不用再装 .NET。当前不要加 `PublishTrimmed` / NativeAOT（Avalonia + AtomUI 会裁掉所需程序集）。
+
+在仓库根目录执行：
+
+```bash
+dotnet publish src/RedisDesktop.App/RedisDesktop.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=None -p:DebugSymbols=false -p:CopyOutputSymbolsToPublishDirectory=false -o artifacts/win-x64
+```
+
+PowerShell 等价写法：
+
+```powershell
+dotnet publish src/RedisDesktop.App/RedisDesktop.App.csproj `
+  -c Release `
+  -r win-x64 `
+  --self-contained true `
+  -p:PublishSingleFile=true `
+  -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:EnableCompressionInSingleFile=true `
+  -p:DebugType=None `
+  -p:DebugSymbols=false `
+  -p:CopyOutputSymbolsToPublishDirectory=false `
+  -o artifacts/win-x64
+```
+
+产物是 `artifacts/win-x64/RedisDesktop.exe`。把该目录打成 zip 后即可作为 GitHub Release 附件：
+
+```powershell
+Compress-Archive -Path artifacts/win-x64/* -DestinationPath artifacts/RedisDesktop-win-x64.zip -Force
+```
+
+其他平台把 `-r win-x64` 换成对应 RID，并改输出目录：
+
+| 平台 | Runtime |
+|------|---------|
+| Windows x64 | `win-x64` |
+| Windows ARM64 | `win-arm64` |
+| macOS Apple Silicon | `osx-arm64` |
+| macOS Intel | `osx-x64` |
+| Linux x64 | `linux-x64` |
+
 ## 集合编辑
 
 Hash / Set / ZSet 使用 `HSCAN` / `SSCAN` / `ZSCAN` 分页，禁止一次 `HGETALL`。List 使用 `LRANGE`，页脚标明「按索引修改基于当前快照」。Stream 使用 `XRANGE`，删除条目会二次确认。只读连接会禁用写入（GUI 与 CLI 共用同一套写命令表）。Hash field TTL 在探测到 `HEXPIRE` 后才会显示。
@@ -52,10 +94,6 @@ dotnet test
 
 Infrastructure 烟测默认连接 `192.168.227.5` 的 db15。连不上则跳过而不是失败。可用 `REDIS_TEST_HOST` 覆盖。
 
-## 文档
-
-- [docs/开发规划.md](docs/开发规划.md)
-- [docs/技术架构.md](docs/技术架构.md)
 
 ## 许可注意
 

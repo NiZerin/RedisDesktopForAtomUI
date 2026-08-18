@@ -4,7 +4,8 @@
              xmlns:antdicons="https://atomui.net/icons/antdesign"
              xmlns:vm="using:RedisDesktop.App.ViewModels"
              x:Class="RedisDesktop.App.Views.KeyBrowserView"
-             x:DataType="vm:KeyBrowserViewModel">
+             x:DataType="vm:KeyBrowserViewModel"
+             Background="{atom:SharedTokenResource ColorBgContainer}">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Spacing="6">
             <Grid ColumnDefinitions="*,8,Auto,8,Auto,Auto">
@@ -75,10 +76,19 @@
                          IsEnabled="{Binding CanLoadAll}"
                          ToolTip.Tip="{Binding Loc.LoadAllTip}" />
         </UniformGrid>
-        <Panel MinHeight="220" Height="360">
+        <Border MinHeight="220"
+                Height="360"
+                Background="{atom:SharedTokenResource ColorBgLayout}"
+                BorderBrush="{atom:SharedTokenResource ColorBorderSecondary}"
+                BorderThickness="1"
+                CornerRadius="4"
+                ClipToBounds="True">
+            <Panel>
             <atom:TreeView ItemsSource="{Binding TreeRoots}"
                            SelectedItem="{Binding SelectedTreeNode, Mode=TwoWay}"
                            IsVisible="{Binding IsTreeMode}"
+                           Background="{atom:SharedTokenResource ColorBgLayout}"
+                           Foreground="{atom:SharedTokenResource ColorText}"
                            Height="360"
                            IsShowIcon="False"
                            IsShowEmptyIndicator="False"
@@ -120,11 +130,12 @@
                                            Margin="0,0,4,0" />
                             <atom:TextBlock DockPanel.Dock="Right"
                                             Text="{Binding CountText}"
-                                            Opacity="0.55"
+                                            Foreground="{atom:SharedTokenResource ColorTextSecondary}"
                                             Margin="8,0,0,0"
                                             VerticalAlignment="Center"
                                             IsVisible="{Binding IsFolder}" />
                             <atom:TextBlock Text="{Binding Title}"
+                                            Foreground="{atom:SharedTokenResource ColorText}"
                                             TextTrimming="CharacterEllipsis"
                                             VerticalAlignment="Center" />
                         </DockPanel>
@@ -135,6 +146,8 @@
                           SelectedItem="{Binding SelectedFlatItem, Mode=TwoWay}"
                           IsVisible="{Binding IsFlatMode}"
                           Height="360"
+                          Background="{atom:SharedTokenResource ColorBgLayout}"
+                          Foreground="{atom:SharedTokenResource ColorText}"
                           IsBorderless="True"
                           IsShowEmptyIndicator="False"
                           SizeType="Small"
@@ -163,6 +176,7 @@
                                            Margin="0,0,6,0" />
                             <atom:TextBlock Grid.Column="1"
                                             Text="{Binding Display}"
+                                            Foreground="{atom:SharedTokenResource ColorText}"
                                             TextTrimming="CharacterEllipsis"
                                             VerticalAlignment="Center" />
                         </Grid>
@@ -170,10 +184,11 @@
                 </atom:ListBox.ItemTemplate>
             </atom:ListBox>
             <atom:TextBlock Text="{Binding Loc.EmptyKeys}"
-                            Opacity="0.45"
+                            Foreground="{atom:SharedTokenResource ColorTextSecondary}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             IsVisible="{Binding ShowEmpty}" />
-        </Panel>
+            </Panel>
+        </Border>
     </DockPanel>
 </UserControl>

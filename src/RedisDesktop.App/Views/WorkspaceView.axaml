@@ -4,11 +4,13 @@
              xmlns:vm="using:RedisDesktop.App.ViewModels"
              xmlns:local="using:RedisDesktop.App"
              x:Class="RedisDesktop.App.Views.WorkspaceView"
-             x:DataType="vm:WorkspaceViewModel">
-    <Grid>
+             x:DataType="vm:WorkspaceViewModel"
+             Background="{atom:SharedTokenResource ColorBgLayout}">
+    <Grid Background="{atom:SharedTokenResource ColorBgLayout}">
         <atom:TextBlock HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    Opacity="0.7"
+                   Foreground="{atom:SharedTokenResource ColorTextSecondary}"
                    IsVisible="{Binding HasNoTabs}"
                    Text="{Binding Loc.EmptyWorkspace}" />
         <atom:TabControl Name="WorkspaceTabs"

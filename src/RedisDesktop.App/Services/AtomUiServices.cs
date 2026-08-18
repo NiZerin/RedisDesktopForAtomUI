@@ -1,8 +1,10 @@
 using AtomUI;
+using AtomUI.Data;
 using AtomUI.Desktop.Controls;
 using AtomUI.Theme;
 using AtomUI.Theme.Algorithms;
 using AtomUI.Theme.Configuration;
+using AtomUI.Theme.Resources;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -203,6 +205,15 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             ? desktop.MainWindow
             : null;
 
+    private static void ApplyWindowSurfaces(AtomWindow window)
+    {
+        TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.BackgroundProperty, SharedTokenKind.ColorBgLayout);
+        TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.ContentFrameBackgroundProperty, SharedTokenKind.ColorBgLayout);
+        TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.TitleBarFrameBackgroundProperty, SharedTokenKind.ColorBgContainer);
+        TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.TransparencyBackgroundFallbackProperty, SharedTokenKind.ColorBgLayout);
+        TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.ForegroundProperty, SharedTokenKind.ColorText);
+    }
+
     private static Task<bool> ShowMessageAsync(string title, string message, bool showCancel)
         => ShowContentAsync(
             title,
@@ -244,6 +255,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = true
         };
+        ApplyWindowSurfaces(window);
 
         ok.Click += (_, _) =>
         {
@@ -302,6 +314,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = true
         };
+        ApplyWindowSurfaces(window);
 
         ok.Click += (_, _) =>
         {
@@ -362,6 +375,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = true
         };
+        ApplyWindowSurfaces(window);
 
         ok.Click += (_, _) =>
         {
@@ -414,6 +428,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = true
         };
+        ApplyWindowSurfaces(window);
 
         close.Click += (_, _) => window.Close();
         clear.Click += (_, _) => viewModel.ClearCommand.Execute(null);
@@ -473,6 +488,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = true
         };
+        ApplyWindowSurfaces(window);
 
         ok.Click += (_, _) =>
         {

@@ -10,17 +10,24 @@
              Height="800"
              MinWidth="900"
              MinHeight="560"
+             Background="{atom:SharedTokenResource ColorBgLayout}"
+             ContentFrameBackground="{atom:SharedTokenResource ColorBgLayout}"
+             TitleBarFrameBackground="{atom:SharedTokenResource ColorBgContainer}"
+             TransparencyBackgroundFallback="{atom:SharedTokenResource ColorBgLayout}"
+             Foreground="{atom:SharedTokenResource ColorText}"
              WindowStartupLocation="CenterScreen">
     <LayoutTransformControl>
         <LayoutTransformControl.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ZoomFactor}" ScaleY="{Binding ZoomFactor}" />
         </LayoutTransformControl.LayoutTransform>
-    <DockPanel>
+    <DockPanel Background="{atom:SharedTokenResource ColorBgLayout}">
         <atom:TextBlock DockPanel.Dock="Bottom"
                         Margin="12,6"
                         Opacity="0.7"
+                        Foreground="{atom:SharedTokenResource ColorTextSecondary}"
                         Text="{Binding StatusText}" />
         <atom:Splitter Orientation="Vertical"
+                       Background="{atom:SharedTokenResource ColorBgLayout}"
                        ResizeCompleted="OnMainSplitterResizeCompleted">
             <views:AsideView x:Name="AsidePane"
                              DataContext="{Binding Aside}"

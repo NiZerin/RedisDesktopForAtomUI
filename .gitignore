@@ -33,6 +33,9 @@ coverage*.xml
 *.DotSettings
 .avalonia/
 
+## Publish
+artifacts/
+
 source/
 docs/
 docker/

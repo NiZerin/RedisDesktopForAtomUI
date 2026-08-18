@@ -5,7 +5,8 @@
              xmlns:vm="using:RedisDesktop.App.ViewModels"
              xmlns:views="using:RedisDesktop.App.Views"
              x:Class="RedisDesktop.App.Views.ConnectionItemView"
-             x:DataType="vm:ConnectionItemViewModel">
+             x:DataType="vm:ConnectionItemViewModel"
+             Background="{atom:SharedTokenResource ColorBgContainer}">
     <UserControl.Resources>
         <DataTemplate x:Key="DatabaseOptionTemplate" x:DataType="vm:DatabaseNodeViewModel">
             <StackPanel Orientation="Horizontal" Spacing="4">
@@ -17,6 +18,7 @@
         </DataTemplate>
     </UserControl.Resources>
     <Border Margin="0,0,0,8"
+            Background="{atom:SharedTokenResource ColorBgContainer}"
             BorderBrush="{Binding MarkerBrush}"
             BorderThickness="{Binding ColorBarThickness}"
             CornerRadius="4,0,0,4"

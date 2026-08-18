@@ -5,7 +5,8 @@
              xmlns:vm="using:RedisDesktop.App.ViewModels"
              xmlns:views="using:RedisDesktop.App.Views"
              x:Class="RedisDesktop.App.Views.AsideView"
-             x:DataType="vm:AsideViewModel">
+             x:DataType="vm:AsideViewModel"
+             Background="{atom:SharedTokenResource ColorBgContainer}">
     <UserControl.DataTemplates>
         <DataTemplate x:DataType="vm:ConnectionGroupViewModel">
             <atom:Expander Header="{Binding Title}"
@@ -25,7 +26,9 @@
             <views:ConnectionItemView />
         </DataTemplate>
     </UserControl.DataTemplates>
-    <Grid RowDefinitions="Auto,*" Margin="8">
+    <Grid RowDefinitions="Auto,*"
+          Margin="8"
+          Background="{atom:SharedTokenResource ColorBgContainer}">
         <DockPanel Grid.Row="0" Margin="0,0,0,8">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
                 <atom:Button Width="44"
