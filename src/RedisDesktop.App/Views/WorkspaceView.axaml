@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             xmlns:local="using:RedisDesktop.App"
+             x:Class="RedisDesktop.App.Views.WorkspaceView"
+             x:DataType="vm:WorkspaceViewModel">
+    <Grid>
+        <atom:TextBlock HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Opacity="0.7"
+                   IsVisible="{Binding HasNoTabs}"
+                   Text="{Binding Loc.EmptyWorkspace}" />
+        <atom:TabControl Name="WorkspaceTabs"
+                         ItemsSource="{Binding Tabs}"
+                         SelectedItem="{Binding SelectedTab, Mode=TwoWay}"
+                         IsTabClosable="True"
+                         IsTabReorderEnabled="True"
+                         IsVisible="{Binding HasTabs}"
+                         Closed="OnTabClosed"
+                         PointerPressed="OnTabsPointerPressed">
+            <atom:TabControl.ItemTemplate>
+                <local:ViewLocator />
+            </atom:TabControl.ItemTemplate>
+        </atom:TabControl>
+    </Grid>
+</UserControl>

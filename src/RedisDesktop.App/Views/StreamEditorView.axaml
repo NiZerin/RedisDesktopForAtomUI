@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.StreamEditorView"
+             x:DataType="vm:StreamEditorViewModel">
+    <DockPanel>
+        <Grid DockPanel.Dock="Top"
+              ColumnDefinitions="*,8,Auto"
+              Margin="0,0,0,8">
+            <atom:LineEdit PlaceholderText="field:value,field2:value2"
+                           Text="{Binding NewFields}"
+                           SizeType="Small"
+                           IsEnabled="{Binding CanWrite}" />
+            <atom:Button Grid.Column="2"
+                         Content="XADD"
+                         ButtonType="Primary"
+                         SizeType="Small"
+                         Command="{Binding AddCommand}"
+                         IsEnabled="{Binding CanWrite}" />
+        </Grid>
+        <atom:TextBlock DockPanel.Dock="Top"
+                        Opacity="0.7"
+                        Margin="0,0,0,8"
+                        Text="{Binding StatusText}" />
+        <atom:Button DockPanel.Dock="Bottom"
+                     Content="{Binding Loc.LoadMore}"
+                     SizeType="Small"
+                     HorizontalAlignment="Stretch"
+                     Margin="0,8,0,0"
+                     Command="{Binding NextPageCommand}"
+                     IsEnabled="{Binding CanGoNext}" />
+        <atom:DataGrid ItemsSource="{Binding Entries}"
+                       SizeType="Small"
+                       IsFrameBorderVisible="True"
+                       CanUserResizeColumns="True"
+                       IsHideOnSinglePage="True"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch">
+            <atom:DataGrid.Columns>
+                <atom:DataGridTemplateColumn Header="ID" Width="180">
+                    <atom:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:StreamEntryViewModel">
+                            <atom:TextBlock Text="{Binding Id}"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0" />
+                        </DataTemplate>
+                    </atom:DataGridTemplateColumn.CellTemplate>
+                </atom:DataGridTemplateColumn>
+                <atom:DataGridTemplateColumn Header="Value" Width="*">
+                    <atom:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:StreamEntryViewModel">
+                            <atom:TextBlock Text="{Binding DisplayBody}"
+                                            TextTrimming="CharacterEllipsis"
+                                            ToolTip.Tip="{Binding Body}"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0" />
+                        </DataTemplate>
+                    </atom:DataGridTemplateColumn.CellTemplate>
+                </atom:DataGridTemplateColumn>
+                <atom:DataGridTemplateColumn Header="Operate" Width="72">
+                    <atom:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:StreamEntryViewModel">
+                            <atom:Button ButtonType="Text"
+                                         SizeType="Small"
+                                         Icon="{antdicons:AntDesignIconProvider DeleteOutlined}"
+                                         ToolTip.Tip="{Binding Loc.Delete}"
+                                         Command="{Binding DeleteCommand}"
+                                         IsEnabled="{Binding CanWrite}" />
+                        </DataTemplate>
+                    </atom:DataGridTemplateColumn.CellTemplate>
+                </atom:DataGridTemplateColumn>
+            </atom:DataGrid.Columns>
+        </atom:DataGrid>
+    </DockPanel>
+</UserControl>

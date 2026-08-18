@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel"
+             MinWidth="680">
+    <atom:ScrollViewer>
+        <StackPanel Spacing="12">
+            <atom:Card Header="{Binding Loc.UiSettings}" SizeType="Small">
+                <UniformGrid Columns="2">
+                    <StackPanel Spacing="6" Margin="0,0,12,12">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.ThemeSelect}" />
+                        <atom:ComboBox ItemsSource="{Binding ThemeOptions}"
+                                       SelectedItem="{Binding SelectedTheme}"
+                                       HorizontalAlignment="Stretch"
+                                       SizeType="Middle"
+                                       ShouldUseOverlayPopup="False">
+                            <atom:ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingChoice">
+                                    <atom:TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </atom:ComboBox.ItemTemplate>
+                        </atom:ComboBox>
+                    </StackPanel>
+                    <StackPanel Spacing="6" Margin="0,0,0,12">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.SelectLang}" />
+                        <atom:ComboBox ItemsSource="{Binding LanguageOptions}"
+                                       SelectedItem="{Binding SelectedLanguage}"
+                                       HorizontalAlignment="Stretch"
+                                       SizeType="Middle"
+                                       ShouldUseOverlayPopup="False">
+                            <atom:ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:SettingChoice">
+                                    <atom:TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </atom:ComboBox.ItemTemplate>
+                        </atom:ComboBox>
+                    </StackPanel>
+                    <StackPanel Spacing="6" Margin="0,0,12,0">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.PageZoom}" />
+                        <atom:NumericUpDown Value="{Binding ZoomFactor}"
+                                            Minimum="0.5"
+                                            Maximum="2"
+                                            Increment="0.1"
+                                            FormatString="0.0"
+                                            HorizontalAlignment="Stretch"
+                                            SizeType="Middle" />
+                    </StackPanel>
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <atom:TextBlock Opacity="0.75"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Loc.FontFamily}" />
+                            <atom:Button ButtonType="Text"
+                                         SizeType="Small"
+                                         Icon="{antdicons:AntDesignIconProvider QuestionCircleOutlined}"
+                                         ToolTip.Tip="{Binding Loc.FontFaq}" />
+                        </StackPanel>
+                        <atom:ComboBox ItemsSource="{Binding FontOptions}"
+                                       SelectedItem="{Binding SelectedFont}"
+                                       HorizontalAlignment="Stretch"
+                                       SizeType="Middle"
+                                       IsFilterEnabled="True"
+                                       IsEditable="True"
+                                       ShouldUseOverlayPopup="False"
+                                       DropDownOpened="OnFontDropDownOpened" />
+                    </StackPanel>
+                </UniformGrid>
+            </atom:Card>
+
+            <atom:Card Header="{Binding Loc.CommonSettings}" SizeType="Small">
+                <UniformGrid Columns="2">
+                    <StackPanel Spacing="6" Margin="0,0,12,0">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <atom:TextBlock Opacity="0.75"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Loc.KeysPerLoading}" />
+                            <atom:Button ButtonType="Text"
+                                         SizeType="Small"
+                                         Icon="{antdicons:AntDesignIconProvider QuestionCircleOutlined}"
+                                         ToolTip.Tip="{Binding Loc.KeysPerLoadingTip}" />
+                        </StackPanel>
+                        <atom:NumericUpDown Value="{Binding ScanCount}"
+                                            Minimum="10"
+                                            Maximum="20000"
+                                            Increment="50"
+                                            HorizontalAlignment="Stretch"
+                                            SizeType="Middle" />
+                    </StackPanel>
+                    <StackPanel Spacing="6">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.ConfigConnections}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <atom:Button Content="{Binding Loc.Export}"
+                                         Icon="{antdicons:AntDesignIconProvider UploadOutlined}"
+                                         Command="{Binding ExportConnectionsCommand}" />
+                            <atom:Button Content="{Binding Loc.Import}"
+                                         Icon="{antdicons:AntDesignIconProvider DownloadOutlined}"
+                                         Command="{Binding ImportConnectionsCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                </UniformGrid>
+            </atom:Card>
+
+            <atom:Card SizeType="Small">
+                <atom:Card.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <atom:TextBlock Text="{Binding Loc.PreVersion}" FontWeight="SemiBold" />
+                        <atom:Tag Text="{Binding AppVersion}" TagColor="info" />
+                    </StackPanel>
+                </atom:Card.Header>
+                <StackPanel Orientation="Horizontal" Spacing="16">
+                    <atom:HyperLinkButton Content="{Binding Loc.Hotkey}"
+                                          Command="{Binding ShowHotkeysCommand}" />
+                    <atom:HyperLinkButton Content="{Binding Loc.ClearCache}"
+                                          Command="{Binding ClearCacheCommand}" />
+                    <atom:HyperLinkButton Content="{Binding Loc.OpenConfigFolder}"
+                                          Command="{Binding OpenConfigFolderCommand}" />
+                </StackPanel>
+            </atom:Card>
+        </StackPanel>
+    </atom:ScrollViewer>
+</UserControl>

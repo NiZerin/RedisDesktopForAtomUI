@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.HotkeysView"
+             x:DataType="vm:SettingsViewModel">
+    <atom:DataGrid ItemsSource="{Binding Hotkeys}"
+                   SizeType="Small"
+                   MinHeight="280"
+                   MaxHeight="420"
+                   IsReadOnly="True"
+                   IsFrameBorderVisible="True"
+                   IsHideOnSinglePage="True"
+                   CanUserResizeColumns="True"
+                   HorizontalAlignment="Stretch">
+        <atom:DataGrid.Columns>
+            <atom:DataGridTextColumn Header="{Binding Loc.HotkeyKey}"
+                                     Binding="{Binding Key}"
+                                     Width="220" />
+            <atom:DataGridTextColumn Header="{Binding Loc.HotkeyDesc}"
+                                     Binding="{Binding Description}"
+                                     Width="*" />
+        </atom:DataGrid.Columns>
+    </atom:DataGrid>
+</UserControl>

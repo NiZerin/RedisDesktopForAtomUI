@@ -1,0 +1,157 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             xmlns:views="using:RedisDesktop.App.Views"
+             x:Class="RedisDesktop.App.Views.ConnectionItemView"
+             x:DataType="vm:ConnectionItemViewModel">
+    <UserControl.Resources>
+        <DataTemplate x:Key="DatabaseOptionTemplate" x:DataType="vm:DatabaseNodeViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <atom:TextBlock Text="{Binding Name}" />
+                <atom:TextBlock Text="{Binding KeyCountText}"
+                                Opacity="0.65"
+                                IsVisible="{Binding HasKeyCount}" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Border Margin="0,0,0,8"
+            BorderBrush="{Binding MarkerBrush}"
+            BorderThickness="{Binding ColorBarThickness}"
+            CornerRadius="4,0,0,4"
+            PointerPressed="OnPointerPressed">
+        <Border.ContextMenu>
+            <atom:ContextMenu>
+                <atom:MenuItem Header="{Binding Loc.CloseConnection}"
+                          Command="{Binding DisconnectCommand}"
+                          IsEnabled="{Binding IsConnected}" />
+                <atom:MenuItem Header="{Binding Loc.EditConnection}" Command="{Binding EditCommand}" />
+                <atom:MenuItem Header="{Binding Loc.DeleteConnection}" Command="{Binding DeleteCommand}" />
+                <atom:MenuItem Header="{Binding Loc.DuplicateConnection}" Command="{Binding CloneCommand}" />
+                <atom:MenuItem Header="{Binding Loc.MarkColor}">
+                    <atom:MenuItem Header="{Binding Loc.ColorRed}" Command="{Binding UseColorCommand}" CommandParameter="red" />
+                    <atom:MenuItem Header="{Binding Loc.ColorOrange}" Command="{Binding UseColorCommand}" CommandParameter="orange" />
+                    <atom:MenuItem Header="{Binding Loc.ColorGreen}" Command="{Binding UseColorCommand}" CommandParameter="green" />
+                    <atom:MenuItem Header="{Binding Loc.ColorBlue}" Command="{Binding UseColorCommand}" CommandParameter="blue" />
+                    <atom:MenuItem Header="{Binding Loc.ColorPurple}" Command="{Binding UseColorCommand}" CommandParameter="purple" />
+                    <atom:MenuItem Header="{Binding Loc.ColorNone}" Command="{Binding UseColorCommand}" CommandParameter="none" />
+                </atom:MenuItem>
+                <atom:MenuSeparator />
+                <atom:MenuItem Header="{Binding Loc.Connect}"
+                          Command="{Binding OpenCommand}"
+                          IsVisible="{Binding IsDisconnected}" />
+                <atom:MenuItem Header="{Binding Loc.OpenCli}" Command="{Binding OpenCliCommand}" />
+                <atom:MenuItem Header="{Binding Loc.OpenPubSub}" Command="{Binding OpenPubSubCommand}" />
+                <atom:MenuItem Header="{Binding Loc.MoveToGroup}" Command="{Binding MoveToGroupCommand}" />
+                <atom:MenuItem Header="{Binding Loc.FlushDb}"
+                          Command="{Binding FlushDbCommand}"
+                          IsEnabled="{Binding CanWrite}" />
+            </atom:ContextMenu>
+        </Border.ContextMenu>
+        <atom:Expander Header="{Binding Title}"
+                       SizeType="Small"
+                       IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <atom:Expander.AddOnContent>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="0"
+                            PointerPressed="OnAddonPointerPressed">
+                    <atom:Button ButtonType="Text"
+                                 SizeType="Small"
+                                 Icon="{antdicons:AntDesignIconProvider HomeOutlined}"
+                                 ToolTip.Tip="{Binding Loc.Home}"
+                                 Command="{Binding ShowHomeCommand}" />
+                    <atom:Button ButtonType="Text"
+                                 SizeType="Small"
+                                 Icon="{antdicons:AntDesignIconProvider CodeOutlined}"
+                                 ToolTip.Tip="{Binding Loc.OpenCli}"
+                                 Command="{Binding OpenCliCommand}" />
+                    <atom:Button ButtonType="Text"
+                                 SizeType="Small"
+                                 Icon="{antdicons:AntDesignIconProvider ReloadOutlined}"
+                                 ToolTip.Tip="{Binding Loc.Refresh}"
+                                 Command="{Binding RefreshConnectionCommand}" />
+                    <atom:Button ButtonType="Text"
+                                 SizeType="Small"
+                                 Icon="{antdicons:AntDesignIconProvider MenuOutlined}"
+                                 ToolTip.Tip="{Binding Loc.More}">
+                        <atom:Button.Flyout>
+                            <atom:MenuFlyout Placement="BottomEdgeAlignedRight">
+                                <atom:MenuItem Header="{Binding Loc.CloseConnection}"
+                                               Icon="{antdicons:AntDesignIconProvider PoweroffOutlined}"
+                                               Command="{Binding DisconnectCommand}"
+                                               IsEnabled="{Binding IsConnected}" />
+                                <atom:MenuItem Header="{Binding Loc.EditConnection}"
+                                               Icon="{antdicons:AntDesignIconProvider EditOutlined}"
+                                               Command="{Binding EditCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.DeleteConnection}"
+                                               Icon="{antdicons:AntDesignIconProvider DeleteOutlined}"
+                                               Command="{Binding DeleteCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.DuplicateConnection}"
+                                               Icon="{antdicons:AntDesignIconProvider CopyOutlined}"
+                                               Command="{Binding CloneCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.MarkColor}"
+                                               Icon="{antdicons:AntDesignIconProvider BgColorsOutlined}">
+                                    <atom:MenuItem Header="{Binding Loc.ColorRed}"
+                                                   Command="{Binding UseColorCommand}"
+                                                   CommandParameter="red" />
+                                    <atom:MenuItem Header="{Binding Loc.ColorOrange}"
+                                                   Command="{Binding UseColorCommand}"
+                                                   CommandParameter="orange" />
+                                    <atom:MenuItem Header="{Binding Loc.ColorGreen}"
+                                                   Command="{Binding UseColorCommand}"
+                                                   CommandParameter="green" />
+                                    <atom:MenuItem Header="{Binding Loc.ColorBlue}"
+                                                   Command="{Binding UseColorCommand}"
+                                                   CommandParameter="blue" />
+                                    <atom:MenuItem Header="{Binding Loc.ColorPurple}"
+                                                   Command="{Binding UseColorCommand}"
+                                                   CommandParameter="purple" />
+                                    <atom:MenuItem Header="{Binding Loc.ColorNone}"
+                                                   Command="{Binding UseColorCommand}"
+                                                   CommandParameter="none" />
+                                </atom:MenuItem>
+                                <atom:MenuItem Header="{Binding Loc.OpenCli}"
+                                               Icon="{antdicons:AntDesignIconProvider CodeOutlined}"
+                                               Command="{Binding OpenCliCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.OpenPubSub}"
+                                               Command="{Binding OpenPubSubCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.MoveToGroup}"
+                                               Icon="{antdicons:AntDesignIconProvider FolderOutlined}"
+                                               Command="{Binding MoveToGroupCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.FlushDb}"
+                                               Icon="{antdicons:AntDesignIconProvider WarningOutlined}"
+                                               Command="{Binding FlushDbCommand}"
+                                               IsEnabled="{Binding CanWrite}" />
+                            </atom:MenuFlyout>
+                        </atom:Button.Flyout>
+                    </atom:Button>
+                </StackPanel>
+            </atom:Expander.AddOnContent>
+            <StackPanel Spacing="8" Margin="0,8,0,0">
+                <Grid ColumnDefinitions="*,8,*"
+                      IsVisible="{Binding ShowOperatePanel}">
+                    <atom:ComboBox ItemsSource="{Binding Children}"
+                                   SelectedItem="{Binding SelectedDatabase}"
+                                   SizeType="Middle"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Stretch"
+                                   IsVisible="{Binding ShowDatabasePicker}"
+                                   ItemTemplate="{StaticResource DatabaseOptionTemplate}"
+                                   SelectionBoxItemTemplate="{StaticResource DatabaseOptionTemplate}" />
+                    <atom:Button Grid.Column="2"
+                                 SizeType="Middle"
+                                 VerticalAlignment="Center"
+                                 Icon="{antdicons:AntDesignIconProvider PlusOutlined}"
+                                 Content="{Binding Loc.NewKey}"
+                                 HorizontalAlignment="Stretch"
+                                 Command="{Binding NewKeyCommand}"
+                                 IsEnabled="{Binding CanWrite}" />
+                </Grid>
+                <Panel IsVisible="{Binding ShowOperatePanel}">
+                    <views:KeyBrowserView DataContext="{Binding Browser}" />
+                </Panel>
+            </StackPanel>
+        </atom:Expander>
+    </Border>
+</UserControl>

@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.CliTabView"
+             x:DataType="vm:CliTabViewModel">
+    <DockPanel Margin="12">
+        <atom:Space DockPanel.Dock="Top" SizeType="Small">
+            <atom:TextBlock Text="{Binding Title}" FontWeight="Bold" />
+            <atom:Button Content="{Binding Loc.CopyOutput}" Command="{Binding CopyOutputCommand}" />
+            <atom:Button Content="{Binding Loc.CopyFull}" Command="{Binding CopyFullOutputCommand}" />
+            <atom:TextBlock Text="{Binding StatusText}" Opacity="0.7" VerticalAlignment="Center" />
+        </atom:Space>
+        <atom:Space DockPanel.Dock="Bottom" SizeType="Small" Margin="0,8,0,0">
+            <atom:LineEdit PlaceholderText="例如 GET mykey，↑ 历史，Tab 补全，Ctrl+L 清屏"
+                           Text="{Binding Input}"
+                           KeyDown="OnInputKeyDown" />
+            <atom:Button Content="{Binding Loc.Execute}" ButtonType="Primary" Command="{Binding ExecuteCommand}" />
+        </atom:Space>
+        <atom:ListBox DockPanel.Dock="Bottom"
+                 Height="88"
+                 Margin="0,4"
+                 SizeType="Small"
+                 IsShowEmptyIndicator="False"
+                 ItemsSource="{Binding FilteredSuggestions}"
+                 DoubleTapped="OnSuggestionDoubleTapped">
+            <atom:ListBox.ItemTemplate>
+                <DataTemplate>
+                    <atom:TextBlock Text="{Binding}" FontFamily="Consolas,Cascadia Mono,monospace" />
+                </DataTemplate>
+            </atom:ListBox.ItemTemplate>
+        </atom:ListBox>
+        <atom:TextArea Text="{Binding Output}"
+                       IsReadOnly="True"
+                       FontFamily="Consolas,Cascadia Mono,monospace" />
+    </DockPanel>
+</UserControl>

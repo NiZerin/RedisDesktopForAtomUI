@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             xmlns:views="using:RedisDesktop.App.Views"
+             x:Class="RedisDesktop.App.Views.AsideView"
+             x:DataType="vm:AsideViewModel">
+    <UserControl.DataTemplates>
+        <DataTemplate x:DataType="vm:ConnectionGroupViewModel">
+            <atom:Expander Header="{Binding Title}"
+                           SizeType="Small"
+                           Margin="0,0,0,8"
+                           IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                <ItemsControl ItemsSource="{Binding Children}" Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ConnectionItemViewModel">
+                            <views:ConnectionItemView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </atom:Expander>
+        </DataTemplate>
+        <DataTemplate x:DataType="vm:ConnectionItemViewModel">
+            <views:ConnectionItemView />
+        </DataTemplate>
+    </UserControl.DataTemplates>
+    <Grid RowDefinitions="Auto,*" Margin="8">
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+                <atom:Button Width="44"
+                             Icon="{antdicons:AntDesignIconProvider SettingOutlined}"
+                             ToolTip.Tip="{Binding Loc.Settings}"
+                             Command="{Binding OpenSettingsCommand}" />
+                <atom:Button Width="44"
+                             Icon="{antdicons:AntDesignIconProvider ClockCircleOutlined}"
+                             ToolTip.Tip="{Binding Loc.CommandLog}"
+                             Command="{Binding OpenCommandLogCommand}" />
+            </StackPanel>
+            <atom:Button Content="{Binding Loc.NewConnection}"
+                         ButtonType="Primary"
+                         HorizontalAlignment="Stretch"
+                         Margin="0,0,8,0"
+                         Command="{Binding NewConnectionCommand}" />
+        </DockPanel>
+        <DockPanel Grid.Row="1">
+            <atom:LineEdit DockPanel.Dock="Top"
+                           Margin="0,0,0,8"
+                           PlaceholderText="{Binding Loc.SearchConnections}"
+                           Text="{Binding Filter}"
+                           IsVisible="{Binding ShowFilter}" />
+            <StackPanel DockPanel.Dock="Top"
+                        Spacing="8"
+                        Margin="0,0,0,8"
+                        IsVisible="{Binding IsEmpty}">
+                <atom:TextBlock Opacity="0.7"
+                           TextWrapping="Wrap"
+                           Text="{Binding Loc.EmptyConnections}" />
+                <atom:Space SizeType="Small">
+                    <atom:Button Content="{Binding Loc.Import}" Command="{Binding ImportConnectionsCommand}" />
+                    <atom:Button Content="{Binding Loc.Export}" Command="{Binding ExportConnectionsCommand}" />
+                </atom:Space>
+            </StackPanel>
+            <atom:ScrollViewer IsVisible="{Binding HasConnections}">
+                <atom:ScrollViewer.ContextMenu>
+                    <atom:ContextMenu>
+                        <atom:MenuItem Header="{Binding Loc.Import}" Command="{Binding ImportConnectionsCommand}" />
+                        <atom:MenuItem Header="{Binding Loc.Export}" Command="{Binding ExportConnectionsCommand}" />
+                    </atom:ContextMenu>
+                </atom:ScrollViewer.ContextMenu>
+                <ItemsControl ItemsSource="{Binding Nodes}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ContentControl Content="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </atom:ScrollViewer>
+        </DockPanel>
+    </Grid>
+</UserControl>

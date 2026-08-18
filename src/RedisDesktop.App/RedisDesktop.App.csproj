@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <RootNamespace>RedisDesktop.App</RootNamespace>
+    <ApplicationTitle>Redis Desktop</ApplicationTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" Condition="Exists('Assets')" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AtomUI.Desktop.Controls" Version="6.1.3" />
+    <PackageReference Include="AtomUI.Desktop.Controls.DataGrid" Version="6.1.3" />
+    <PackageReference Include="AtomUI.Icons.AntDesign" Version="6.1.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RedisDesktop.Core\RedisDesktop.Core.csproj" />
+    <ProjectReference Include="..\RedisDesktop.Infrastructure\RedisDesktop.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,161 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.ConnectionEditorView"
+             x:DataType="vm:ConnectionEditorViewModel">
+    <StackPanel Spacing="12">
+        <Grid ColumnDefinitions="*,16,*">
+            <atom:Form FormLayout="Vertical">
+                <atom:FormItem LabelText="{Binding Loc.Host}" IsRequired="True" Layout="Vertical">
+                    <atom:LineEdit Text="{Binding Host}" PlaceholderText="127.0.0.1" />
+                </atom:FormItem>
+                <atom:FormItem LabelText="{Binding Loc.Password}"
+                               Layout="Vertical"
+                               IsVisible="{Binding IsNotSentinel}">
+                    <atom:LineEdit Text="{Binding Password}"
+                                   PlaceholderText="Auth"
+                                   PasswordChar="•"
+                                   RevealPassword="False"
+                                   IsEnableRevealButton="True" />
+                </atom:FormItem>
+                <atom:FormItem LabelText="{Binding Loc.Password}"
+                               Layout="Vertical"
+                               IsVisible="{Binding IsSentinel}">
+                    <atom:LineEdit Text="{Binding SentinelPassword}"
+                                   PlaceholderText="Auth"
+                                   PasswordChar="•"
+                                   RevealPassword="False"
+                                   IsEnableRevealButton="True" />
+                </atom:FormItem>
+                <atom:FormItem LabelText="{Binding Loc.ConnectionName}" Layout="Vertical">
+                    <atom:LineEdit Text="{Binding Name}" />
+                </atom:FormItem>
+                <atom:FormItem LabelText="{Binding Loc.Group}" Layout="Vertical">
+                    <atom:LineEdit Text="{Binding GroupName}"
+                                   PlaceholderText="{Binding Loc.SelectGroup}" />
+                </atom:FormItem>
+            </atom:Form>
+
+            <atom:Form Grid.Column="2" FormLayout="Vertical">
+                <atom:FormItem LabelText="{Binding Loc.Port}" IsRequired="True" Layout="Vertical">
+                    <atom:LineEdit Text="{Binding Port}" PlaceholderText="6379" />
+                </atom:FormItem>
+                <atom:FormItem LabelText="{Binding Loc.Username}" Layout="Vertical">
+                    <atom:LineEdit Text="{Binding Username}"
+                                   PlaceholderText="{Binding Loc.AclUsernameHint}" />
+                </atom:FormItem>
+                <atom:FormItem LabelText="{Binding Loc.Separator}"
+                               Layout="Vertical"
+                               ToolTip.Tip="{Binding Loc.SeparatorTip}">
+                    <atom:LineEdit Text="{Binding KeySeparator}"
+                                   PlaceholderText="{Binding Loc.SeparatorPlaceholder}" />
+                </atom:FormItem>
+            </atom:Form>
+        </Grid>
+
+        <WrapPanel>
+            <atom:CheckBox Content="SSH" IsChecked="{Binding SshEnabled}" Margin="0,0,16,8" />
+            <atom:CheckBox Content="TLS/SSL" IsChecked="{Binding TlsEnabled}" Margin="0,0,16,8" />
+            <atom:CheckBox Content="Sentinel"
+                           IsChecked="{Binding SentinelChecked}"
+                           Margin="0,0,16,8"
+                           ToolTip.Tip="{Binding Loc.SentinelHint}" />
+            <atom:CheckBox Content="Cluster"
+                           IsChecked="{Binding ClusterChecked}"
+                           Margin="0,0,16,8"
+                           ToolTip.Tip="{Binding Loc.ClusterHint}" />
+            <atom:CheckBox Content="Readonly"
+                           IsChecked="{Binding ReadOnly}"
+                           Margin="0,0,16,8"
+                           ToolTip.Tip="{Binding Loc.ReadonlyHint}" />
+        </WrapPanel>
+
+        <StackPanel Spacing="8" IsVisible="{Binding SshEnabled}">
+            <atom:Separator Title="SSH Tunnel" TitlePosition="Left" />
+            <Grid ColumnDefinitions="*,16,*">
+                <atom:Form FormLayout="Vertical">
+                    <atom:FormItem LabelText="{Binding Loc.Host}" IsRequired="True" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding SshHost}" />
+                    </atom:FormItem>
+                    <atom:FormItem LabelText="{Binding Loc.Username}" IsRequired="True" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding SshUsername}" />
+                    </atom:FormItem>
+                    <atom:FormItem LabelText="{Binding Loc.PrivateKey}" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding SshPrivateKeyPath}"
+                                       PlaceholderText="SSH Private Key" />
+                    </atom:FormItem>
+                    <atom:FormItem LabelText="Passphrase" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding SshPassphrase}"
+                                       PlaceholderText="Passphrase for Private Key"
+                                       PasswordChar="•"
+                                       RevealPassword="False"
+                                       IsEnableRevealButton="True" />
+                    </atom:FormItem>
+                </atom:Form>
+                <atom:Form Grid.Column="2" FormLayout="Vertical">
+                    <atom:FormItem LabelText="{Binding Loc.Port}" IsRequired="True" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding SshPort}" PlaceholderText="22" />
+                    </atom:FormItem>
+                    <atom:FormItem LabelText="{Binding Loc.Password}" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding SshPassword}"
+                                       PlaceholderText="SSH Password"
+                                       PasswordChar="•"
+                                       RevealPassword="False"
+                                       IsEnableRevealButton="True" />
+                    </atom:FormItem>
+                </atom:Form>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Spacing="8" IsVisible="{Binding TlsEnabled}">
+            <atom:Separator Title="TLS/SSL" TitlePosition="Left" />
+            <Grid ColumnDefinitions="*,16,*">
+                <atom:Form FormLayout="Vertical">
+                    <atom:FormItem LabelText="{Binding Loc.PrivateKey}" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding TlsKeyPath}"
+                                       PlaceholderText="SSL Private Key Pem (key)" />
+                    </atom:FormItem>
+                    <atom:FormItem LabelText="{Binding Loc.Authority}" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding TlsCaPath}"
+                                       PlaceholderText="SSL Certificate Authority (CA)" />
+                    </atom:FormItem>
+                    <atom:CheckBox Content="{Binding Loc.SkipCertValidation}"
+                                   IsChecked="{Binding SkipCertValidation}"
+                                   Margin="0,8,0,0" />
+                </atom:Form>
+                <atom:Form Grid.Column="2" FormLayout="Vertical">
+                    <atom:FormItem LabelText="{Binding Loc.PublicKey}" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding TlsCertPath}"
+                                       PlaceholderText="SSL Public Key Pem (cert)" />
+                    </atom:FormItem>
+                    <atom:FormItem LabelText="SNI" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding TlsServerName}"
+                                       PlaceholderText="SNI Servername" />
+                    </atom:FormItem>
+                </atom:Form>
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Spacing="8" IsVisible="{Binding IsSentinel}">
+            <atom:Separator Title="Sentinel" TitlePosition="Left" />
+            <Grid ColumnDefinitions="*,16,*">
+                <atom:Form FormLayout="Vertical">
+                    <atom:FormItem LabelText="{Binding Loc.RedisNodePassword}" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding Password}"
+                                       PlaceholderText="Redis Node Password"
+                                       PasswordChar="•"
+                                       RevealPassword="False"
+                                       IsEnableRevealButton="True" />
+                    </atom:FormItem>
+                </atom:Form>
+                <atom:Form Grid.Column="2" FormLayout="Vertical">
+                    <atom:FormItem LabelText="{Binding Loc.MasterGroupName}" IsRequired="True" Layout="Vertical">
+                        <atom:LineEdit Text="{Binding MasterName}"
+                                       PlaceholderText="Master Group Name" />
+                    </atom:FormItem>
+                </atom:Form>
+            </Grid>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,38 @@
+## Build
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+## NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+## IDE
+.vs/
+.idea/
+.vscode/
+*.swp
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Test / coverage
+TestResults/
+coverage*.json
+coverage*.xml
+
+## Avalonia / Rider
+*.DotSettings
+.avalonia/
+
+source/
+docs/
+docker/

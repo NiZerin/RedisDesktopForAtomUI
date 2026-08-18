@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.PromptTextView"
+             x:DataType="vm:PromptTextViewModel"
+             Width="360">
+    <atom:Space Orientation="Vertical" SizeType="Middle" Margin="8">
+        <atom:TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+        <atom:LineEdit Text="{Binding Text}" />
+    </atom:Space>
+</UserControl>

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RedisDesktop.App/RedisDesktop.App.csproj" />
+    <Project Path="src/RedisDesktop.Core/RedisDesktop.Core.csproj" />
+    <Project Path="src/RedisDesktop.Infrastructure/RedisDesktop.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RedisDesktop.Core.Tests/RedisDesktop.Core.Tests.csproj" />
+    <Project Path="tests/RedisDesktop.Infrastructure.Tests/RedisDesktop.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

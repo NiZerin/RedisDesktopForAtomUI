@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.PubSubTabView"
+             x:DataType="vm:PubSubTabViewModel">
+    <DockPanel Margin="12">
+        <atom:Space DockPanel.Dock="Top" Orientation="Vertical" SizeType="Small">
+            <atom:TextBlock FontWeight="Bold" Text="{Binding Title}" />
+            <atom:Space SizeType="Small">
+                <atom:LineEdit PlaceholderText="频道或模式，例如 news 或 news.*"
+                               Text="{Binding Channel}"
+                               MinWidth="200" />
+                <atom:CheckBox Content="{Binding Loc.Pattern}" IsChecked="{Binding UsePattern}" />
+                <atom:Button Content="{Binding Loc.Subscribe}" ButtonType="Primary" Command="{Binding SubscribeCommand}" />
+                <atom:Button Content="{Binding Loc.Unsubscribe}" Command="{Binding UnsubscribeCommand}" />
+            </atom:Space>
+            <atom:Space SizeType="Small" IsVisible="{Binding CanWrite}">
+                <atom:LineEdit PlaceholderText="发布频道" Text="{Binding PublishChannel}" MinWidth="120" />
+                <atom:LineEdit PlaceholderText="消息" Text="{Binding PublishMessage}" MinWidth="180" />
+                <atom:Button Content="{Binding Loc.Publish}" Command="{Binding PublishCommand}" />
+            </atom:Space>
+            <atom:TextBlock Opacity="0.7" Text="{Binding StatusText}" />
+        </atom:Space>
+        <atom:ListBox ItemsSource="{Binding Messages}"
+                      SizeType="Small"
+                      IsShowEmptyIndicator="False">
+            <atom:ListBox.ItemTemplate>
+                <DataTemplate>
+                    <atom:TextBlock Text="{Binding}"
+                                    FontFamily="Consolas,Cascadia Mono,monospace"
+                                    TextWrapping="Wrap" />
+                </DataTemplate>
+            </atom:ListBox.ItemTemplate>
+        </atom:ListBox>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.CommandLogView"
+             x:DataType="vm:CommandLogViewModel">
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom"
+              ColumnDefinitions="200,12,Auto,*"
+              Margin="0,12,0,0">
+            <atom:LineEdit PlaceholderText="{Binding Loc.SearchInPage}"
+                           Text="{Binding Filter}"
+                           SizeType="Small" />
+            <atom:CheckBox Grid.Column="2"
+                           Content="{Binding Loc.OnlyWrite}"
+                           IsChecked="{Binding ShowOnlyWrite}"
+                           VerticalAlignment="Center" />
+        </Grid>
+        <atom:DataGrid x:Name="LogGrid"
+                       ItemsSource="{Binding VisibleEntries}"
+                       SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                       SizeType="Small"
+                       MinHeight="280"
+                       IsReadOnly="True"
+                       IsFrameBorderVisible="True"
+                       CanUserResizeColumns="True"
+                       CanUserSortColumns="True"
+                       IsHideOnSinglePage="True"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch">
+            <atom:DataGrid.Columns>
+                <atom:DataGridTextColumn Header="Time"
+                                         Binding="{Binding Time}"
+                                         Width="90"
+                                         SortMemberPath="Time" />
+                <atom:DataGridTextColumn Header="Connection"
+                                         Binding="{Binding Connection}"
+                                         Width="168"
+                                         SortMemberPath="Connection" />
+                <atom:DataGridTemplateColumn Header="CMD"
+                                             Width="130"
+                                             SortMemberPath="Command">
+                    <atom:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CommandLogItemViewModel">
+                            <atom:TextBlock Text="{Binding Command}"
+                                            FontWeight="SemiBold"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0" />
+                        </DataTemplate>
+                    </atom:DataGridTemplateColumn.CellTemplate>
+                </atom:DataGridTemplateColumn>
+                <atom:DataGridTemplateColumn Header="Args"
+                                             Width="*"
+                                             SortMemberPath="Args">
+                    <atom:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CommandLogItemViewModel">
+                            <atom:TextBlock Text="{Binding Args}"
+                                            TextTrimming="CharacterEllipsis"
+                                            ToolTip.Tip="{Binding Args}"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0" />
+                        </DataTemplate>
+                    </atom:DataGridTemplateColumn.CellTemplate>
+                </atom:DataGridTemplateColumn>
+                <atom:DataGridTemplateColumn Header="Cost(ms)"
+                                             Width="100"
+                                             SortMemberPath="Cost">
+                    <atom:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:CommandLogItemViewModel">
+                            <atom:TextBlock Text="{Binding Cost}"
+                                            Foreground="{atom:SharedTokenResource ColorError}"
+                                            VerticalAlignment="Center"
+                                            Margin="8,0" />
+                        </DataTemplate>
+                    </atom:DataGridTemplateColumn.CellTemplate>
+                </atom:DataGridTemplateColumn>
+            </atom:DataGrid.Columns>
+        </atom:DataGrid>
+    </DockPanel>
+</UserControl>

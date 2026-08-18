@@ -1,0 +1,179 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.KeyBrowserView"
+             x:DataType="vm:KeyBrowserViewModel">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Spacing="6">
+            <Grid ColumnDefinitions="*,8,Auto,8,Auto,Auto">
+                <atom:LineEdit PlaceholderText="{Binding Loc.SearchKeys}"
+                               Text="{Binding Pattern, Mode=TwoWay}"
+                               SizeType="Middle"
+                               HorizontalAlignment="Stretch"
+                               KeyDown="OnPatternKeyDown" />
+                <atom:Button Grid.Column="2"
+                             ButtonType="Text"
+                             SizeType="Small"
+                             Icon="{antdicons:AntDesignIconProvider SearchOutlined}"
+                             ToolTip.Tip="{Binding Loc.SearchKeys}"
+                             Command="{Binding SearchCommand}"
+                             IsLoading="{Binding IsBusy}"
+                             IsEnabled="{Binding CanLoadAll}" />
+                <atom:Button Grid.Column="4"
+                             ButtonType="Text"
+                             SizeType="Small"
+                             Icon="{antdicons:AntDesignIconProvider CloseCircleOutlined}"
+                             ToolTip.Tip="{Binding Loc.Cancel}"
+                             IsVisible="{Binding IsBusy}"
+                             Command="{Binding CancelSearchCommand}"
+                             Margin="0,0,4,0" />
+                <atom:CheckBox Grid.Column="5"
+                               VerticalAlignment="Center"
+                               IsChecked="{Binding IsExactSearch}"
+                               ToolTip.Tip="{Binding Loc.ExactSearch}" />
+            </Grid>
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                  IsVisible="{Binding ShowBatchBar}"
+                  Margin="0,0,0,4">
+                <atom:CheckBox VerticalAlignment="Center"
+                               IsChecked="{Binding IsCheckAll}"
+                               ToolTip.Tip="{Binding Loc.ToggleCheckAll}" />
+                <atom:Button Grid.Column="2"
+                             SizeType="Small"
+                             Content="{Binding Loc.Delete}"
+                             IsDanger="True"
+                             Command="{Binding DeleteCheckedCommand}"
+                             IsEnabled="{Binding CanWrite}"
+                             MinWidth="64"
+                             Margin="0,0,6,0" />
+                <atom:Button Grid.Column="3"
+                             SizeType="Small"
+                             Content="{Binding Loc.Cancel}"
+                             Command="{Binding ExitMultiSelectCommand}"
+                             MinWidth="64" />
+            </Grid>
+            <atom:TextBlock Opacity="0.65"
+                       FontSize="11"
+                       Text="{Binding StatusText}"
+                       TextWrapping="Wrap" />
+        </StackPanel>
+        <UniformGrid DockPanel.Dock="Bottom" Columns="2" Margin="0,8,0,0">
+            <atom:Button Content="{Binding Loc.LoadMore}"
+                         SizeType="Small"
+                         Margin="0,0,4,0"
+                         HorizontalAlignment="Stretch"
+                         Command="{Binding LoadMoreCommand}"
+                         IsEnabled="{Binding CanLoadMore}" />
+            <atom:Button Content="{Binding Loc.LoadAll}"
+                         SizeType="Small"
+                         Margin="4,0,0,0"
+                         HorizontalAlignment="Stretch"
+                         IsDanger="True"
+                         Command="{Binding LoadAllCommand}"
+                         IsEnabled="{Binding CanLoadAll}"
+                         ToolTip.Tip="{Binding Loc.LoadAllTip}" />
+        </UniformGrid>
+        <Panel MinHeight="220" Height="360">
+            <atom:TreeView ItemsSource="{Binding TreeRoots}"
+                           SelectedItem="{Binding SelectedTreeNode, Mode=TwoWay}"
+                           IsVisible="{Binding IsTreeMode}"
+                           Height="360"
+                           IsShowIcon="False"
+                           IsShowEmptyIndicator="False"
+                           IsSelectOnRightClick="False"
+                           ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                           ScrollViewer.VerticalScrollBarVisibility="Auto"
+                           PointerPressed="OnTreePointerPressed"
+                           KeyDown="OnTreeKeyDown">
+                <atom:TreeView.ContextMenu>
+                    <atom:ContextMenu>
+                        <atom:MenuItem Header="{Binding Loc.Copy}"
+                                  Command="{Binding CopyKeyCommand}"
+                                  IsVisible="{Binding ShowKeyMenu}" />
+                        <atom:MenuItem Header="{Binding Loc.Delete}"
+                                  Command="{Binding DeleteKeyCommand}"
+                                  IsVisible="{Binding ShowKeyMenu}"
+                                  IsEnabled="{Binding CanWrite}" />
+                        <atom:MenuItem Header="{Binding Loc.MultipleSelect}"
+                                  Command="{Binding BeginMultiSelectCommand}" />
+                        <atom:MenuItem Header="{Binding Loc.OpenNewTab}"
+                                  Command="{Binding OpenNewTabCommand}"
+                                  IsVisible="{Binding ShowKeyMenu}" />
+                        <atom:MenuItem Header="{Binding Loc.LoadCurrentFolder}"
+                                  Command="{Binding LoadCurrentFolderCommand}"
+                                  IsVisible="{Binding ShowFolderMenu}" />
+                        <atom:MenuItem Header="{Binding Loc.DeleteFolder}"
+                                  Command="{Binding DeleteFolderCommand}"
+                                  IsVisible="{Binding ShowFolderMenu}"
+                                  IsEnabled="{Binding CanWrite}" />
+                    </atom:ContextMenu>
+                </atom:TreeView.ContextMenu>
+                <atom:TreeView.ItemTemplate>
+                    <TreeDataTemplate x:DataType="vm:KeyNodeViewModel" ItemsSource="{Binding Children}">
+                        <DockPanel MinHeight="22" LastChildFill="True">
+                            <atom:CheckBox DockPanel.Dock="Left"
+                                           IsVisible="{Binding Browser.IsMultiSelect}"
+                                           IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,4,0" />
+                            <atom:TextBlock DockPanel.Dock="Right"
+                                            Text="{Binding CountText}"
+                                            Opacity="0.55"
+                                            Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding IsFolder}" />
+                            <atom:TextBlock Text="{Binding Title}"
+                                            TextTrimming="CharacterEllipsis"
+                                            VerticalAlignment="Center" />
+                        </DockPanel>
+                    </TreeDataTemplate>
+                </atom:TreeView.ItemTemplate>
+            </atom:TreeView>
+            <atom:ListBox ItemsSource="{Binding FlatKeys}"
+                          SelectedItem="{Binding SelectedFlatItem, Mode=TwoWay}"
+                          IsVisible="{Binding IsFlatMode}"
+                          Height="360"
+                          IsBorderless="True"
+                          IsShowEmptyIndicator="False"
+                          SizeType="Small"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          PointerPressed="OnFlatPointerPressed"
+                          KeyDown="OnFlatKeyDown">
+                <atom:ListBox.ContextMenu>
+                    <atom:ContextMenu>
+                        <atom:MenuItem Header="{Binding Loc.Copy}" Command="{Binding CopyKeyCommand}" />
+                        <atom:MenuItem Header="{Binding Loc.Delete}"
+                                  Command="{Binding DeleteKeyCommand}"
+                                  IsEnabled="{Binding CanWrite}" />
+                        <atom:MenuItem Header="{Binding Loc.MultipleSelect}"
+                                  Command="{Binding BeginMultiSelectCommand}" />
+                        <atom:MenuItem Header="{Binding Loc.OpenNewTab}"
+                                  Command="{Binding OpenNewTabCommand}" />
+                    </atom:ContextMenu>
+                </atom:ListBox.ContextMenu>
+                <atom:ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:KeyListItemViewModel">
+                        <Grid ColumnDefinitions="Auto,*" MinHeight="22">
+                            <atom:CheckBox IsVisible="{Binding Browser.IsMultiSelect}"
+                                           IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,6,0" />
+                            <atom:TextBlock Grid.Column="1"
+                                            Text="{Binding Display}"
+                                            TextTrimming="CharacterEllipsis"
+                                            VerticalAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </atom:ListBox.ItemTemplate>
+            </atom:ListBox>
+            <atom:TextBlock Text="{Binding Loc.EmptyKeys}"
+                            Opacity="0.45"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsVisible="{Binding ShowEmpty}" />
+        </Panel>
+    </DockPanel>
+</UserControl>

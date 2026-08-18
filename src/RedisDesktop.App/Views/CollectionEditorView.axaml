@@ -1,0 +1,187 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.CollectionEditorView"
+             x:DataType="vm:CollectionEditorViewModel">
+    <Panel>
+        <DockPanel>
+            <Grid DockPanel.Dock="Top"
+                  ColumnDefinitions="Auto,8,*,8,Auto"
+                  Margin="0,0,0,8">
+                <atom:Button Content="{Binding Loc.AddNewLine}"
+                             ButtonType="Primary"
+                             SizeType="Small"
+                             Command="{Binding BeginAddCommand}"
+                             IsEnabled="{Binding CanWrite}" />
+                <atom:LineEdit Grid.Column="2"
+                               PlaceholderText="{Binding Loc.SearchInPage}"
+                               Text="{Binding ClientFilter}"
+                               SizeType="Small" />
+                <atom:Button Grid.Column="4"
+                             Content="{Binding Loc.Refresh}"
+                             SizeType="Small"
+                             Command="{Binding RefreshPageCommand}" />
+            </Grid>
+            <atom:TextBlock DockPanel.Dock="Top"
+                            Opacity="0.7"
+                            Margin="0,0,0,8"
+                            Text="{Binding IdHeader}" />
+            <atom:TextBlock DockPanel.Dock="Top"
+                            Opacity="0.7"
+                            Margin="0,0,0,8"
+                            Text="{Binding ListHint}"
+                            IsVisible="{Binding IsList}" />
+            <atom:Button DockPanel.Dock="Bottom"
+                         Content="{Binding Loc.LoadMore}"
+                         SizeType="Small"
+                         HorizontalAlignment="Stretch"
+                         Margin="0,8,0,0"
+                         Command="{Binding NextPageCommand}"
+                         IsEnabled="{Binding CanGoNext}" />
+            <atom:DataGrid ItemsSource="{Binding FilteredRows}"
+                           SizeType="Small"
+                           IsFrameBorderVisible="True"
+                           CanUserResizeColumns="True"
+                           IsHideOnSinglePage="True"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch">
+                <atom:DataGrid.Columns>
+                    <atom:DataGridTemplateColumn Header="ID" Width="88">
+                        <atom:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                                <atom:TextBlock Text="{Binding IndexText}"
+                                                VerticalAlignment="Center"
+                                                Margin="8,0" />
+                            </DataTemplate>
+                        </atom:DataGridTemplateColumn.CellTemplate>
+                    </atom:DataGridTemplateColumn>
+                    <atom:DataGridTemplateColumn Header="Key"
+                                                 Width="160"
+                                                 IsVisible="{Binding ShowNameColumn}">
+                        <atom:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                                <atom:TextBlock Text="{Binding DisplayName}"
+                                                TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding Name}"
+                                                VerticalAlignment="Center"
+                                                Margin="8,0" />
+                            </DataTemplate>
+                        </atom:DataGridTemplateColumn.CellTemplate>
+                    </atom:DataGridTemplateColumn>
+                    <atom:DataGridTemplateColumn Header="Value"
+                                                 Width="*"
+                                                 IsVisible="{Binding ShowValueColumn}">
+                        <atom:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                                <atom:TextBlock Text="{Binding DisplayValue}"
+                                                TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding Value}"
+                                                VerticalAlignment="Center"
+                                                Margin="8,0" />
+                            </DataTemplate>
+                        </atom:DataGridTemplateColumn.CellTemplate>
+                    </atom:DataGridTemplateColumn>
+                    <atom:DataGridTemplateColumn Header="Score"
+                                                 Width="90"
+                                                 IsVisible="{Binding ShowScoreColumn}">
+                        <atom:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                                <atom:TextBlock Text="{Binding ScoreText}"
+                                                VerticalAlignment="Center"
+                                                Margin="8,0" />
+                            </DataTemplate>
+                        </atom:DataGridTemplateColumn.CellTemplate>
+                    </atom:DataGridTemplateColumn>
+                    <atom:DataGridTemplateColumn Header="TTL"
+                                                 Width="80"
+                                                 IsVisible="{Binding ShowTtlColumn}">
+                        <atom:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                                <atom:TextBlock Text="{Binding TtlInput}"
+                                                VerticalAlignment="Center"
+                                                Margin="8,0" />
+                            </DataTemplate>
+                        </atom:DataGridTemplateColumn.CellTemplate>
+                    </atom:DataGridTemplateColumn>
+                    <atom:DataGridTemplateColumn Header="Operate" Width="168">
+                        <atom:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vm:CollectionRowViewModel">
+                                <StackPanel Orientation="Horizontal" Spacing="0">
+                                    <atom:Button ButtonType="Text"
+                                                 SizeType="Small"
+                                                 Icon="{antdicons:AntDesignIconProvider CopyOutlined}"
+                                                 ToolTip.Tip="{Binding Loc.Copy}"
+                                                 Command="{Binding CopyCommand}" />
+                                    <atom:Button ButtonType="Text"
+                                                 SizeType="Small"
+                                                 Icon="{antdicons:AntDesignIconProvider EditOutlined}"
+                                                 ToolTip.Tip="{Binding Loc.Edit}"
+                                                 Command="{Binding EditCommand}"
+                                                 IsEnabled="{Binding CanWrite}" />
+                                    <atom:Button ButtonType="Text"
+                                                 SizeType="Small"
+                                                 Icon="{antdicons:AntDesignIconProvider DeleteOutlined}"
+                                                 ToolTip.Tip="{Binding Loc.Delete}"
+                                                 Command="{Binding DeleteCommand}"
+                                                 IsEnabled="{Binding CanWrite}" />
+                                    <atom:Button ButtonType="Text"
+                                                 SizeType="Small"
+                                                 Icon="{antdicons:AntDesignIconProvider CodeOutlined}"
+                                                 ToolTip.Tip="{Binding Loc.DumpRow}"
+                                                 Command="{Binding DumpCommand}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </atom:DataGridTemplateColumn.CellTemplate>
+                    </atom:DataGridTemplateColumn>
+                </atom:DataGrid.Columns>
+            </atom:DataGrid>
+        </DockPanel>
+        <Border Background="{atom:SharedTokenResource ColorBgMask}"
+                IsVisible="{Binding IsEditing}">
+            <Border Background="{atom:SharedTokenResource ColorBgElevated}"
+                    CornerRadius="8"
+                    Padding="20"
+                    Width="640"
+                    MaxHeight="560"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <DockPanel>
+                    <atom:TextBlock DockPanel.Dock="Top"
+                                    FontWeight="Bold"
+                                    Margin="0,0,0,12"
+                                    Text="{Binding EditTitle}" />
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Spacing="8"
+                                Margin="0,16,0,0">
+                        <atom:Button Content="{Binding Loc.Cancel}" Command="{Binding CancelEditCommand}" />
+                        <atom:Button Content="{Binding Loc.Ok}"
+                                     ButtonType="Primary"
+                                     Command="{Binding CommitEditCommand}"
+                                     IsEnabled="{Binding CanWrite}" />
+                    </StackPanel>
+                    <StackPanel Spacing="10">
+                        <atom:LineEdit Text="{Binding EditName}"
+                                       LeftAddOn="{Binding Loc.Field}"
+                                       IsVisible="{Binding ShowNameColumn}" />
+                        <atom:LineEdit Text="{Binding EditScore}"
+                                       LeftAddOn="{Binding Loc.Score}"
+                                       IsVisible="{Binding ShowScoreColumn}" />
+                        <atom:LineEdit Text="{Binding EditTtl}"
+                                       LeftAddOn="TTL"
+                                       IsVisible="{Binding ShowTtlColumn}" />
+                        <atom:TextArea Text="{Binding EditValue}"
+                                       AcceptsReturn="True"
+                                       TextWrapping="Wrap"
+                                       MinHeight="220"
+                                       FontFamily="Cascadia Mono, Consolas, monospace"
+                                       IsVisible="{Binding ShowValueColumn}" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Border>
+    </Panel>
+</UserControl>

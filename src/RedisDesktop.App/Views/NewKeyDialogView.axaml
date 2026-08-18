@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.NewKeyDialogView"
+             x:DataType="vm:NewKeyDialogViewModel"
+             ClipToBounds="False">
+    <atom:Form FormLayout="Vertical" Margin="4,0" ClipToBounds="False">
+        <atom:FormItem LabelText="{Binding Loc.KeyName}" IsRequired="True" Layout="Vertical">
+            <atom:LineEdit Name="KeyNameBox"
+                           Text="{Binding KeyName, Mode=TwoWay}"
+                           HorizontalAlignment="Stretch" />
+        </atom:FormItem>
+        <atom:FormItem LabelText="{Binding Loc.KeyType}" IsRequired="True" Layout="Vertical">
+            <atom:ComboBox ItemsSource="{Binding TypeOptions}"
+                           SelectedItem="{Binding SelectedType, Mode=TwoWay}"
+                           HorizontalAlignment="Stretch"
+                           ShouldUseOverlayPopup="False">
+                <atom:ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:NewKeyTypeOption">
+                        <atom:TextBlock Text="{Binding Display}" />
+                    </DataTemplate>
+                </atom:ComboBox.ItemTemplate>
+            </atom:ComboBox>
+        </atom:FormItem>
+    </atom:Form>
+</UserControl>

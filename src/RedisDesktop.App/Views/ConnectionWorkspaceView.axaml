@@ -1,0 +1,291 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.ConnectionWorkspaceView"
+             x:DataType="vm:ConnectionWorkspaceViewModel"
+             Focusable="True">
+    <atom:ScrollViewer Padding="16">
+        <StackPanel Spacing="16">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <atom:Tag Text="{Binding Loc.AutoRefresh}"
+                          TagColor="info"
+                          Icon="{antdicons:AntDesignIconProvider ReloadOutlined}"
+                          VerticalAlignment="Center" />
+                <atom:ToggleSwitch SizeType="Small"
+                                   IsChecked="{Binding AutoRefresh}"
+                                   ToolTip.Tip="{Binding Loc.AutoRefreshTip}"
+                                   VerticalAlignment="Center" />
+            </StackPanel>
+
+            <UniformGrid Columns="3">
+                <atom:Card SizeType="Small" Margin="0,0,8,0">
+                    <atom:Card.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <atom:IconPresenter Width="16"
+                                                Height="16"
+                                                VerticalAlignment="Center"
+                                                Icon="{antdicons:AntDesignIconProvider CloudServerOutlined}" />
+                            <atom:TextBlock Text="{Binding Loc.Server}" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </atom:Card.Header>
+                    <StackPanel Spacing="8">
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.RedisVersionLabel}" />
+                                <atom:TextBlock Text="{Binding RedisVersion}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding RedisVersion}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.OsLabel}" />
+                                <atom:TextBlock Text="{Binding Os}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding Os}" />
+                            </DockPanel>
+                        </Border>
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.Process}" />
+                                <atom:TextBlock Text="{Binding ProcessId}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </atom:Card>
+
+                <atom:Card SizeType="Small" Margin="4,0">
+                    <atom:Card.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <atom:IconPresenter Width="16"
+                                                Height="16"
+                                                VerticalAlignment="Center"
+                                                Icon="{antdicons:AntDesignIconProvider DashboardOutlined}" />
+                            <atom:TextBlock Text="{Binding Loc.Memory}" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </atom:Card.Header>
+                    <StackPanel Spacing="8">
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.UsedMemory}" />
+                                <atom:TextBlock Text="{Binding UsedMemory}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.UsedMemoryPeak}" />
+                                <atom:TextBlock Text="{Binding UsedMemoryPeak}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.UsedMemoryLua}" />
+                                <atom:TextBlock Text="{Binding UsedMemoryLua}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </atom:Card>
+
+                <atom:Card SizeType="Small" Margin="8,0,0,0">
+                    <atom:Card.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <atom:IconPresenter Width="16"
+                                                Height="16"
+                                                VerticalAlignment="Center"
+                                                Icon="{antdicons:AntDesignIconProvider LineChartOutlined}" />
+                            <atom:TextBlock Text="{Binding Loc.Stats}" FontWeight="SemiBold" />
+                        </StackPanel>
+                    </atom:Card.Header>
+                    <StackPanel Spacing="8">
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.Clients}" />
+                                <atom:TextBlock Text="{Binding ConnectedClients}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.TotalConnections}" />
+                                <atom:TextBlock Text="{Binding TotalConnections}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                                Padding="8,6">
+                            <DockPanel>
+                                <atom:TextBlock DockPanel.Dock="Left"
+                                                Margin="0,0,8,0"
+                                                Opacity="0.75"
+                                                Text="{Binding Loc.TotalCommands}" />
+                                <atom:TextBlock Text="{Binding TotalCommands}"
+                                                Foreground="{atom:SharedTokenResource ColorSuccess}"
+                                                TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+                        </Border>
+                    </StackPanel>
+                </atom:Card>
+            </UniformGrid>
+
+            <atom:Card SizeType="Small">
+                <atom:Card.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <atom:IconPresenter Width="16"
+                                            Height="16"
+                                            VerticalAlignment="Center"
+                                            Icon="{antdicons:AntDesignIconProvider BarChartOutlined}" />
+                        <atom:TextBlock Text="{Binding Loc.KeyStatistics}" FontWeight="SemiBold" />
+                    </StackPanel>
+                </atom:Card.Header>
+                <atom:DataGrid ItemsSource="{Binding Keyspace}"
+                               SizeType="Small"
+                               MinHeight="120"
+                               MaxHeight="280"
+                               IsReadOnly="True"
+                               IsFrameBorderVisible="True"
+                               CanUserResizeColumns="True"
+                               CanUserSortColumns="True"
+                               IsHideOnSinglePage="True"
+                               HorizontalAlignment="Stretch">
+                    <atom:DataGrid.Columns>
+                        <atom:DataGridTemplateColumn Header="{Binding Loc.Node}"
+                                                     Width="180"
+                                                     SortMemberPath="Node"
+                                                     IsVisible="{Binding IsCluster}">
+                            <atom:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:KeyspaceRowViewModel">
+                                    <atom:TextBlock Text="{Binding Node}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    ToolTip.Tip="{Binding Node}"
+                                                    VerticalAlignment="Center"
+                                                    Margin="8,0" />
+                                </DataTemplate>
+                            </atom:DataGridTemplateColumn.CellTemplate>
+                        </atom:DataGridTemplateColumn>
+                        <atom:DataGridTextColumn Header="DB"
+                                                 Binding="{Binding Database}"
+                                                 Width="100"
+                                                 SortMemberPath="Database" />
+                        <atom:DataGridTextColumn Header="Keys"
+                                                 Binding="{Binding Keys}"
+                                                 Width="*"
+                                                 SortMemberPath="KeysValue" />
+                        <atom:DataGridTextColumn Header="Expires"
+                                                 Binding="{Binding Expires}"
+                                                 Width="*"
+                                                 SortMemberPath="ExpiresValue" />
+                        <atom:DataGridTextColumn Header="Avg TTL"
+                                                 Binding="{Binding AvgTtl}"
+                                                 Width="*"
+                                                 SortMemberPath="AvgTtlValue" />
+                    </atom:DataGrid.Columns>
+                </atom:DataGrid>
+            </atom:Card>
+
+            <atom:Card SizeType="Small">
+                <atom:Card.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <atom:IconPresenter Width="16"
+                                            Height="16"
+                                            VerticalAlignment="Center"
+                                            Icon="{antdicons:AntDesignIconProvider InfoCircleOutlined}" />
+                        <atom:TextBlock Text="{Binding Loc.AllRedisInfo}" FontWeight="SemiBold" />
+                    </StackPanel>
+                </atom:Card.Header>
+                <atom:Card.Extra>
+                    <atom:LineEdit Width="180"
+                                   SizeType="Small"
+                                   PlaceholderText="{Binding Loc.SearchInfo}"
+                                   Text="{Binding InfoFilter}" />
+                </atom:Card.Extra>
+                <atom:DataGrid ItemsSource="{Binding InfoRows}"
+                               SizeType="Small"
+                               MinHeight="240"
+                               MaxHeight="480"
+                               IsReadOnly="True"
+                               IsFrameBorderVisible="True"
+                               CanUserResizeColumns="True"
+                               CanUserSortColumns="True"
+                               IsHideOnSinglePage="True"
+                               HorizontalAlignment="Stretch">
+                    <atom:DataGrid.Columns>
+                        <atom:DataGridTextColumn Header="Key"
+                                                 Binding="{Binding Key}"
+                                                 Width="240"
+                                                 SortMemberPath="Key" />
+                        <atom:DataGridTemplateColumn Header="Value"
+                                                     Width="*"
+                                                     SortMemberPath="Value">
+                            <atom:DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate x:DataType="vm:InfoRowViewModel">
+                                    <atom:TextBlock Text="{Binding Value}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    ToolTip.Tip="{Binding Value}"
+                                                    VerticalAlignment="Center"
+                                                    Margin="8,0" />
+                                </DataTemplate>
+                            </atom:DataGridTemplateColumn.CellTemplate>
+                        </atom:DataGridTemplateColumn>
+                    </atom:DataGrid.Columns>
+                </atom:DataGrid>
+            </atom:Card>
+        </StackPanel>
+    </atom:ScrollViewer>
+</UserControl>

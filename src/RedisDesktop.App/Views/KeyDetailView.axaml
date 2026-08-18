@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             xmlns:views="using:RedisDesktop.App.Views"
+             x:Class="RedisDesktop.App.Views.KeyDetailView"
+             x:DataType="vm:KeyDetailViewModel"
+             KeyDown="OnEditorKeyDown">
+    <Panel Margin="12,8,12,12">
+        <DockPanel IsVisible="{Binding HasKey}">
+            <Grid DockPanel.Dock="Top"
+                  ColumnDefinitions="*,12,220,12,Auto"
+                  Margin="0,0,0,12">
+                <atom:LineEdit Text="{Binding RenameTo}"
+                               IsEnabled="{Binding CanWrite}"
+                               ToolTip.Tip="{Binding Loc.RenameHint}"
+                               LeftAddOn="{Binding TypeName}"
+                               KeyDown="OnKeyNameKeyDown">
+                    <atom:LineEdit.RightAddOn>
+                        <atom:Button ButtonType="Text"
+                                     SizeType="Small"
+                                     Icon="{antdicons:AntDesignIconProvider CheckOutlined}"
+                                     ToolTip.Tip="{Binding Loc.Rename}"
+                                     Command="{Binding RenameCommand}"
+                                     IsEnabled="{Binding CanWrite}" />
+                    </atom:LineEdit.RightAddOn>
+                </atom:LineEdit>
+                <atom:LineEdit Grid.Column="2"
+                               Text="{Binding TtlInput}"
+                               IsEnabled="{Binding CanWrite}"
+                               ToolTip.Tip="{Binding TtlText}"
+                               LeftAddOn="TTL"
+                               KeyDown="OnTtlKeyDown">
+                    <atom:LineEdit.RightAddOn>
+                        <StackPanel Orientation="Horizontal">
+                            <atom:Button ButtonType="Text"
+                                         SizeType="Small"
+                                         Icon="{antdicons:AntDesignIconProvider HistoryOutlined}"
+                                         ToolTip.Tip="{Binding Loc.Persist}"
+                                         Command="{Binding PersistTtlCommand}"
+                                         IsEnabled="{Binding CanWrite}" />
+                            <atom:Button ButtonType="Text"
+                                         SizeType="Small"
+                                         Icon="{antdicons:AntDesignIconProvider CheckOutlined}"
+                                         ToolTip.Tip="{Binding Loc.ApplyTtl}"
+                                         Command="{Binding ApplyTtlCommand}"
+                                         IsEnabled="{Binding CanWrite}" />
+                        </StackPanel>
+                    </atom:LineEdit.RightAddOn>
+                </atom:LineEdit>
+                <StackPanel Grid.Column="4"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            VerticalAlignment="Center">
+                    <atom:Button ButtonType="Primary"
+                                 IsDanger="True"
+                                 SizeType="Middle"
+                                 Icon="{antdicons:AntDesignIconProvider DeleteOutlined}"
+                                 ToolTip.Tip="{Binding Loc.Delete}"
+                                 Command="{Binding DeleteCommand}"
+                                 IsEnabled="{Binding CanWrite}" />
+                    <atom:Button ButtonType="Primary"
+                                 SizeType="Middle"
+                                 Icon="{antdicons:AntDesignIconProvider ReloadOutlined}"
+                                 ToolTip.Tip="{Binding Loc.Refresh}"
+                                 Command="{Binding RefreshCommand}" />
+                    <atom:ToggleSwitch SizeType="Small"
+                                       IsChecked="{Binding AutoRefresh}"
+                                       ToolTip.Tip="{Binding Loc.AutoRefreshTip}"
+                                       VerticalAlignment="Center" />
+                    <atom:Button ButtonType="Primary"
+                                 SizeType="Middle"
+                                 Icon="{antdicons:AntDesignIconProvider CodeOutlined}"
+                                 ToolTip.Tip="{Binding Loc.DumpCommand}"
+                                 Command="{Binding DumpCommand}" />
+                </StackPanel>
+            </Grid>
+            <atom:Button DockPanel.Dock="Bottom"
+                         Content="{Binding Loc.Save}"
+                         ButtonType="Primary"
+                         HorizontalAlignment="Right"
+                         MinWidth="100"
+                         Margin="0,12,0,0"
+                         Command="{Binding SaveCommand}"
+                         IsVisible="{Binding IsString}"
+                         IsEnabled="{Binding CanSaveString}" />
+            <Panel>
+                <DockPanel IsVisible="{Binding IsString}">
+                    <StackPanel DockPanel.Dock="Top"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                Margin="0,0,0,8">
+                        <atom:ComboBox ItemsSource="{Binding ViewerOptions}"
+                                       SelectedItem="{Binding SelectedViewerOption, Mode=TwoWay}"
+                                       Width="130"
+                                       SizeType="Small"
+                                       IsEnabled="{Binding CanChangeViewer}">
+                            <atom:ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ViewerOption">
+                                    <atom:TextBlock Text="{Binding Display}" />
+                                </DataTemplate>
+                            </atom:ComboBox.ItemTemplate>
+                        </atom:ComboBox>
+                        <atom:Tag Text="{Binding Loc.HexTag}"
+                                  VerticalAlignment="Center"
+                                  IsVisible="{Binding ShowHexTag}" />
+                        <atom:Tag Text="{Binding SizeText}"
+                                  VerticalAlignment="Center" />
+                        <atom:Button ButtonType="Text"
+                                     SizeType="Small"
+                                     Icon="{antdicons:AntDesignIconProvider CopyOutlined}"
+                                     Content="{Binding Loc.Copy}"
+                                     Command="{Binding CopyValueCommand}" />
+                    </StackPanel>
+                    <atom:TextBlock DockPanel.Dock="Top"
+                                    Text="{Binding ViewerWarning}"
+                                    Opacity="0.75"
+                                    TextWrapping="Wrap"
+                                    Margin="0,0,0,8"
+                                    IsVisible="{Binding ShowViewerWarning}" />
+                    <atom:TextArea Text="{Binding ValueText}"
+                                   AcceptsReturn="True"
+                                   TextWrapping="Wrap"
+                                   FontFamily="Cascadia Mono, Consolas, monospace"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   MinHeight="240"
+                                   IsReadOnly="{Binding !CanSaveString}" />
+                </DockPanel>
+                <Panel IsVisible="{Binding IsCollection}">
+                    <views:CollectionEditorView DataContext="{Binding Collection}" />
+                </Panel>
+                <Panel IsVisible="{Binding IsStream}">
+                    <views:StreamEditorView DataContext="{Binding Stream}" />
+                </Panel>
+                <atom:TextBlock Text="{Binding UnsupportedMessage}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding ShowUnsupported}" />
+            </Panel>
+        </DockPanel>
+    </Panel>
+</UserControl>

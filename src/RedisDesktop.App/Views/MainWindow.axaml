@@ -1,0 +1,34 @@
+<atom:Window xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             xmlns:views="using:RedisDesktop.App.Views"
+             x:Class="RedisDesktop.App.Views.MainWindow"
+             x:DataType="vm:MainWindowViewModel"
+             Title="Redis Desktop"
+             Width="1280"
+             Height="800"
+             MinWidth="900"
+             MinHeight="560"
+             WindowStartupLocation="CenterScreen">
+    <LayoutTransformControl>
+        <LayoutTransformControl.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding ZoomFactor}" ScaleY="{Binding ZoomFactor}" />
+        </LayoutTransformControl.LayoutTransform>
+    <DockPanel>
+        <atom:TextBlock DockPanel.Dock="Bottom"
+                        Margin="12,6"
+                        Opacity="0.7"
+                        Text="{Binding StatusText}" />
+        <atom:Splitter Orientation="Vertical"
+                       ResizeCompleted="OnMainSplitterResizeCompleted">
+            <views:AsideView x:Name="AsidePane"
+                             DataContext="{Binding Aside}"
+                             atom:Splitter.MinSize="220"
+                             atom:Splitter.MaxSize="520"
+                             atom:Splitter.DefaultSize="265" />
+            <views:WorkspaceView DataContext="{Binding Workspace}" />
+        </atom:Splitter>
+    </DockPanel>
+    </LayoutTransformControl>
+</atom:Window>
