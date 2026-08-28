@@ -10,6 +10,14 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![Platform](https://img.shields.io/badge/Windows-x64-0078D4)
 
+## 截图
+
+![Status 首页](screenshots/ScreenShot_2026-08-28_143022_020.png)
+
+![Key 详情](screenshots/ScreenShot_2026-08-28_143108_925.png)
+
+![设置](screenshots/ScreenShot_2026-08-28_143213_335.png)
+
 ## 下载
 
 到 [Releases](https://github.com/NiZerin/RedisDesktopForAtomUI/releases/latest) 下载 `RedisDesktop-win-x64.zip`，解压后运行 `RedisDesktop.exe`。
