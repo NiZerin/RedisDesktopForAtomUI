@@ -8,33 +8,37 @@
              Background="{atom:SharedTokenResource ColorBgContainer}">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Spacing="6">
-            <Grid ColumnDefinitions="*,8,Auto,8,Auto,Auto">
-                <atom:LineEdit PlaceholderText="{Binding Loc.SearchKeys}"
-                               Text="{Binding Pattern, Mode=TwoWay}"
-                               SizeType="Middle"
-                               HorizontalAlignment="Stretch"
-                               KeyDown="OnPatternKeyDown" />
-                <atom:Button Grid.Column="2"
-                             ButtonType="Text"
-                             SizeType="Small"
-                             Icon="{antdicons:AntDesignIconProvider SearchOutlined}"
-                             ToolTip.Tip="{Binding Loc.SearchKeys}"
-                             Command="{Binding SearchCommand}"
-                             IsLoading="{Binding IsBusy}"
-                             IsEnabled="{Binding CanLoadAll}" />
-                <atom:Button Grid.Column="4"
-                             ButtonType="Text"
-                             SizeType="Small"
-                             Icon="{antdicons:AntDesignIconProvider CloseCircleOutlined}"
-                             ToolTip.Tip="{Binding Loc.Cancel}"
-                             IsVisible="{Binding IsBusy}"
-                             Command="{Binding CancelSearchCommand}"
-                             Margin="0,0,4,0" />
-                <atom:CheckBox Grid.Column="5"
-                               VerticalAlignment="Center"
-                               IsChecked="{Binding IsExactSearch}"
-                               ToolTip.Tip="{Binding Loc.ExactSearch}" />
-            </Grid>
+            <atom:LineEdit PlaceholderText="{Binding Loc.SearchKeys}"
+                           Text="{Binding Pattern, Mode=TwoWay}"
+                           SizeType="Middle"
+                           HorizontalAlignment="Stretch"
+                           KeyDown="OnPatternKeyDown">
+                <atom:LineEdit.RightAddOn>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="0"
+                                VerticalAlignment="Center">
+                        <atom:Button ButtonType="Text"
+                                     SizeType="Small"
+                                     VerticalAlignment="Center"
+                                     Icon="{antdicons:AntDesignIconProvider CloseCircleOutlined}"
+                                     ToolTip.Tip="{Binding Loc.Cancel}"
+                                     IsVisible="{Binding IsBusy}"
+                                     Command="{Binding CancelSearchCommand}" />
+                        <atom:Button ButtonType="Text"
+                                     SizeType="Small"
+                                     VerticalAlignment="Center"
+                                     Icon="{antdicons:AntDesignIconProvider SearchOutlined}"
+                                     ToolTip.Tip="{Binding Loc.SearchKeys}"
+                                     Command="{Binding SearchCommand}"
+                                     IsLoading="{Binding IsBusy}"
+                                     IsEnabled="{Binding CanLoadAll}" />
+                        <atom:CheckBox VerticalAlignment="Center"
+                                       Margin="4,0,0,0"
+                                       IsChecked="{Binding IsExactSearch}"
+                                       ToolTip.Tip="{Binding Loc.ExactSearch}" />
+                    </StackPanel>
+                </atom:LineEdit.RightAddOn>
+            </atom:LineEdit>
             <Grid ColumnDefinitions="Auto,*,Auto,Auto"
                   IsVisible="{Binding ShowBatchBar}"
                   Margin="0,0,0,4">

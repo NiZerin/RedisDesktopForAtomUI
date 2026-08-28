@@ -62,7 +62,9 @@ public sealed class UiStrings : INotifyPropertyChanged
     public string PageZoom => T("页面缩放", "Page Zoom");
     public string FontFamily => T("字体选择", "Font Family");
     public string FontDefault => T("默认", "Default");
-    public string FontFaq => T("字体列表来自本机已安装字体。选「默认」则使用界面自带字体。", "Fonts come from this computer. Choose Default to keep the built-in UI font.");
+    public string FontFaq => T(
+        "列表来自本机已安装字体。下拉项按该字体预览，并标出能显示的文字（中文 / 日文 / 韩文等）。选定后会自动拼接系统里的多语言字体，避免缺字。选「默认」则使用界面自带字体。",
+        "The list comes from fonts installed on this computer. Each item is previewed in its own typeface and shows which scripts it covers. Your pick is followed by system fallbacks so Chinese, Japanese, Korean, and other text still render. Choose Default to keep the built-in UI font.");
     public string KeysPerLoading => T("加载数量", "Load Number");
     public string KeysPerLoadingTip => T("每次 SCAN 加载的 Key 数量，设置过大可能会影响性能。", "Keys loaded per SCAN. Setting this too large may affect performance.");
     public string ConfigConnections => T("连接配置", "Connections");
@@ -72,6 +74,7 @@ public sealed class UiStrings : INotifyPropertyChanged
     public string ClearCacheTip => T("当客户端出现问题时，该操作会删除所有连接和配置，用于恢复客户端。", "When the client misbehaves, this deletes all connections and settings to recover it.");
     public string ClearCacheDone => T("已清除缓存", "Cache cleared");
     public string OpenConfigFolder => T("打开配置目录", "Open Config Folder");
+    public string GitHub => "GitHub";
     public string HotkeyKey => "Key";
     public string HotkeyDesc => T("说明", "Description");
     public string CommandLog => T("命令日志", "Command log");

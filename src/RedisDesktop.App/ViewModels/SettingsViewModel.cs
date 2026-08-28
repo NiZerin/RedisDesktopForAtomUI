@@ -20,6 +20,7 @@ public partial class SettingsViewModel : ViewModelBase
 {
     private readonly AppSettings _original;
     private bool _ready;
+    private bool _fontsLoaded;
 
     public SettingsViewModel(MainWindowViewModel owner)
     {
@@ -37,9 +38,9 @@ public partial class SettingsViewModel : ViewModelBase
             new SettingChoice("zh-CN", "简体中文"),
             new SettingChoice("en-US", "English")
         ];
-        FontOptions.Add(Loc.FontDefault);
+        FontOptions.Add(FontChoice.CreateDefault(Loc.FontDefault));
         LoadFrom(owner.Settings);
-        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.0";
+        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.1";
         _ready = true;
     }
 
@@ -49,11 +50,13 @@ public partial class SettingsViewModel : ViewModelBase
 
     public string AppVersion { get; }
 
+    public string GitHubUrl { get; } = "https://github.com/NiZerin/RedisDesktopForAtomUI";
+
     public IReadOnlyList<SettingChoice> ThemeOptions { get; }
 
     public IReadOnlyList<SettingChoice> LanguageOptions { get; }
 
-    public ObservableCollection<string> FontOptions { get; } = [];
+    public ObservableCollection<FontChoice> FontOptions { get; } = [];
 
     public IReadOnlyList<HotkeyTip> Hotkeys =>
     [
@@ -78,7 +81,7 @@ public partial class SettingsViewModel : ViewModelBase
     private decimal _zoomFactor = 1.0m;
 
     [ObservableProperty]
-    private string _selectedFont = string.Empty;
+    private FontChoice? _selectedFont;
 
     [ObservableProperty]
     private decimal _scanCount = 200;
@@ -91,39 +94,48 @@ public partial class SettingsViewModel : ViewModelBase
         settings.Language = SelectedLanguage?.Value ?? "zh-CN";
         settings.ZoomFactor = (double)ZoomFactor;
         settings.ScanCount = (int)ScanCount;
-        settings.FontFamilies = IsDefaultFont(SelectedFont)
+        settings.FontFamilies = SelectedFont is null || SelectedFont.IsDefault
             ? []
-            : [SelectedFont];
+            : [SelectedFont.Name];
     }
 
     public void RevertPreview()
     {
         Owner.ApplyTheme(_original.ThemeMode, _original.IsDarkTheme);
-        Owner.PreviewZoom(_original.ZoomFactor);
+        Owner.ApplyAppearance(_original);
     }
 
     public void EnsureFonts()
     {
-        if (FontOptions.Count > 1)
+        if (_fontsLoaded)
         {
             return;
         }
 
+        _fontsLoaded = true;
+        var selectedName = SelectedFont?.Name;
+        var wasReady = _ready;
+        _ready = false;
         try
         {
-            var names = FontManager.Current.SystemFonts
-                .Select(font => font.Name)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase);
-            foreach (var name in names)
+            for (var i = FontOptions.Count - 1; i >= 1; i--)
             {
-                FontOptions.Add(name);
+                FontOptions.RemoveAt(i);
+            }
+
+            foreach (var font in UiFontCatalog.ListChoices(Loc.FontDefault, !Loc.IsEnglish).Skip(1))
+            {
+                FontOptions.Add(font);
             }
         }
         catch
         {
             // System font enumeration can fail on some platforms; Default still works.
+        }
+        finally
+        {
+            SelectedFont = FindFont(selectedName);
+            _ready = wasReady;
         }
     }
 
@@ -146,17 +158,22 @@ public partial class SettingsViewModel : ViewModelBase
 
         LoadFrom(Owner.Settings);
         Owner.ApplyTheme(SelectedTheme?.Value ?? "system", false);
-        Owner.PreviewZoom((double)ZoomFactor);
+        Owner.ApplyAppearance(Owner.Settings);
     }
 
     [RelayCommand]
-    private void OpenConfigFolder()
+    private void OpenConfigFolder() => OpenPath(AppPaths.Root);
+
+    [RelayCommand]
+    private void OpenGitHub() => OpenPath(GitHubUrl);
+
+    private static void OpenPath(string path)
     {
         try
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = AppPaths.Root,
+                FileName = path,
                 UseShellExecute = true
             });
         }
@@ -174,6 +191,16 @@ public partial class SettingsViewModel : ViewModelBase
         }
 
         Owner.ApplyTheme(value.Value, string.Equals(value.Value, "dark", StringComparison.OrdinalIgnoreCase));
+    }
+
+    partial void OnSelectedFontChanged(FontChoice? value)
+    {
+        if (!_ready)
+        {
+            return;
+        }
+
+        Owner.PreviewFont(value?.Name, SelectedLanguage?.Value);
     }
 
     partial void OnZoomFactorChanged(decimal value)
@@ -197,18 +224,28 @@ public partial class SettingsViewModel : ViewModelBase
         SelectedLanguage = LanguageOptions.First(x => x.Value == language);
         ZoomFactor = (decimal)Math.Clamp(settings.ZoomFactor <= 0 ? 1 : settings.ZoomFactor, 0.5, 2.0);
         ScanCount = Math.Clamp(settings.ScanCount <= 0 ? 200 : settings.ScanCount, 10, 20000);
-        var font = settings.FontFamilies?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
-        SelectedFont = string.IsNullOrWhiteSpace(font) ? Loc.FontDefault : font;
-        if (!IsDefaultFont(SelectedFont) && !FontOptions.Contains(SelectedFont))
-        {
-            FontOptions.Add(SelectedFont);
-        }
+        SelectedFont = FindFont(settings.FontFamilies?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x)));
     }
 
-    private bool IsDefaultFont(string? font)
-        => string.IsNullOrWhiteSpace(font)
-           || string.Equals(font, Loc.FontDefault, StringComparison.OrdinalIgnoreCase)
-           || string.Equals(font, "Default Initial", StringComparison.OrdinalIgnoreCase);
+    private FontChoice FindFont(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name)
+            || string.Equals(name, Loc.FontDefault, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(name, "Default Initial", StringComparison.OrdinalIgnoreCase))
+        {
+            return FontOptions[0];
+        }
+
+        var match = FontOptions.FirstOrDefault(font => string.Equals(font.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (match is not null)
+        {
+            return match;
+        }
+
+        var custom = new FontChoice(name, name, new FontFamily(UiFontCatalog.SanitizeFamilyName(name)));
+        FontOptions.Add(custom);
+        return custom;
+    }
 
     private static AppSettings Clone(AppSettings settings)
         => new()

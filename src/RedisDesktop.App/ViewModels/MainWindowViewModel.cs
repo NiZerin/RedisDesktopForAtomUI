@@ -169,16 +169,20 @@ public partial class MainWindowViewModel : ViewModelBase
         ZoomFactor = Math.Clamp(zoom <= 0 ? 1 : zoom, 0.5, 2.0);
     }
 
+    public void PreviewFont(string? fontName, string? language = null)
+    {
+        UiFontFamily = UiFontCatalog.Create(
+            string.IsNullOrWhiteSpace(fontName) ? [] : [fontName],
+            language ?? Settings.Language);
+    }
+
     public void ApplyAppearance(AppSettings settings)
     {
         PreviewZoom(settings.ZoomFactor);
         var fonts = (settings.FontFamilies ?? [])
             .Where(name => !string.IsNullOrWhiteSpace(name))
-            .Select(name => name.Trim())
-            .ToList();
-        UiFontFamily = fonts.Count == 0
-            ? null
-            : new FontFamily(string.Join(",", fonts.Select(QuoteFontFamily)));
+            .Select(name => name.Trim());
+        UiFontFamily = UiFontCatalog.Create(fonts, settings.Language);
     }
 
     public async Task<bool> ClearCacheAsync()
@@ -200,11 +204,6 @@ public partial class MainWindowViewModel : ViewModelBase
         StatusText = Loc.ClearCacheDone;
         return true;
     }
-
-    private static string QuoteFontFamily(string name)
-        => name.Contains(' ', StringComparison.Ordinal) || name.Contains(',', StringComparison.Ordinal)
-            ? $"\"{name}\""
-            : name;
 
     [RelayCommand]
     private Task ToggleCommandLogAsync() => _prompt.ShowCommandLogAsync(CommandLog);

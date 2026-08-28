@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:atom="https://atomui.net"
              xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:app="using:RedisDesktop.App"
              xmlns:vm="using:RedisDesktop.App.ViewModels"
              x:Class="RedisDesktop.App.Views.SettingsView"
              x:DataType="vm:SettingsViewModel"
@@ -63,9 +64,32 @@
                                        HorizontalAlignment="Stretch"
                                        SizeType="Middle"
                                        IsFilterEnabled="True"
-                                       IsEditable="True"
                                        ShouldUseOverlayPopup="False"
-                                       DropDownOpened="OnFontDropDownOpened" />
+                                       DropDownOpened="OnFontDropDownOpened">
+                            <atom:ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="app:FontChoice">
+                                    <Grid ColumnDefinitions="*,Auto" MinWidth="240">
+                                        <atom:TextBlock Text="{Binding Label}"
+                                                        FontFamily="{Binding Preview}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        VerticalAlignment="Center" />
+                                        <atom:TextBlock Grid.Column="1"
+                                                        Margin="12,0,0,0"
+                                                        Opacity="0.65"
+                                                        FontFamily="{Binding Preview}"
+                                                        Text="{Binding Sample}"
+                                                        VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </atom:ComboBox.ItemTemplate>
+                            <atom:ComboBox.SelectionBoxItemTemplate>
+                                <DataTemplate x:DataType="app:FontChoice">
+                                    <atom:TextBlock Text="{Binding Label}"
+                                                    FontFamily="{Binding Preview}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                </DataTemplate>
+                            </atom:ComboBox.SelectionBoxItemTemplate>
+                        </atom:ComboBox>
                     </StackPanel>
                 </UniformGrid>
             </atom:Card>
@@ -117,6 +141,9 @@
                                           Command="{Binding ClearCacheCommand}" />
                     <atom:HyperLinkButton Content="{Binding Loc.OpenConfigFolder}"
                                           Command="{Binding OpenConfigFolderCommand}" />
+                    <atom:HyperLinkButton Content="{Binding Loc.GitHub}"
+                                          ToolTip.Tip="{Binding GitHubUrl}"
+                                          Command="{Binding OpenGitHubCommand}" />
                 </StackPanel>
             </atom:Card>
         </StackPanel>
