@@ -68,6 +68,7 @@ public sealed class UiStrings : INotifyPropertyChanged
     public string KeysPerLoading => T("加载数量", "Load Number");
     public string KeysPerLoadingTip => T("每次 SCAN 加载的 Key 数量，设置过大可能会影响性能。", "Keys loaded per SCAN. Setting this too large may affect performance.");
     public string ConfigConnections => T("连接配置", "Connections");
+    public string AppName => "Redis Desktop";
     public string PreVersion => T("当前版本", "Current Version");
     public string Hotkey => T("快捷键", "Hot Key");
     public string ClearCache => T("清除缓存", "Clear Cache");

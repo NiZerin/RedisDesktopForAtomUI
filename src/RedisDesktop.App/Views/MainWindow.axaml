@@ -6,6 +6,7 @@
              x:Class="RedisDesktop.App.Views.MainWindow"
              x:DataType="vm:MainWindowViewModel"
              Title="Redis Desktop"
+             Icon="/Assets/logo.ico"
              Width="1280"
              Height="800"
              MinWidth="900"

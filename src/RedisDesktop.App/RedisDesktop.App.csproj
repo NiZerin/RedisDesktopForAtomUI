@@ -11,7 +11,8 @@
     <AssemblyName>RedisDesktop</AssemblyName>
     <Product>Redis Desktop</Product>
     <ApplicationTitle>Redis Desktop</ApplicationTitle>
-    <Version>1.0.1</Version>
+    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

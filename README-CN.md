@@ -1,5 +1,9 @@
 # Redis Desktop for AtomUI
 
+<p align="center">
+  <img src="screenshots/logo.png" alt="Redis Desktop" width="128" height="128">
+</p>
+
 [English](README.md) | **简体中文**
 
 原生 Redis 桌面客户端，用 [Avalonia](https://avaloniaui.net/) + [AtomUI](https://github.com/AtomUI/AtomUI) 构建，界面结构对标 [Another Redis Desktop Manager](https://github.com/qishibo/AnotherRedisDesktopManager)：左侧连接手风琴里浏览 Key，右侧 Tab 打开 Status、详情和 CLI。不是 Electron。

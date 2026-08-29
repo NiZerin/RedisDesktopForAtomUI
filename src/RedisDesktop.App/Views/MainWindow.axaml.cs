@@ -4,6 +4,7 @@ using AtomUI.Desktop.Controls;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using RedisDesktop.App;
 using RedisDesktop.App.ViewModels;
 
 namespace RedisDesktop.App.Views;
@@ -15,6 +16,7 @@ public partial class MainWindow : AtomUI.Desktop.Controls.Window
     public MainWindow()
     {
         InitializeComponent();
+        Icon = AppAssets.WindowIcon;
         KeyDown += OnWindowKeyDown;
         DataContextChanged += OnDataContextChanged;
     }

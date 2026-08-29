@@ -128,22 +128,36 @@
             </atom:Card>
 
             <atom:Card SizeType="Small">
-                <atom:Card.Header>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <atom:TextBlock Text="{Binding Loc.PreVersion}" FontWeight="SemiBold" />
-                        <atom:Tag Text="{Binding AppVersion}" TagColor="info" />
+                <StackPanel Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Image Width="56"
+                               Height="56"
+                               Stretch="Uniform"
+                               Source="/Assets/logo.png"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <atom:TextBlock FontSize="16"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding Loc.AppName}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <atom:TextBlock Opacity="0.75"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding Loc.PreVersion}" />
+                                <atom:Tag Text="{Binding AppVersion}" TagColor="info" />
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
-                </atom:Card.Header>
-                <StackPanel Orientation="Horizontal" Spacing="16">
-                    <atom:HyperLinkButton Content="{Binding Loc.Hotkey}"
-                                          Command="{Binding ShowHotkeysCommand}" />
-                    <atom:HyperLinkButton Content="{Binding Loc.ClearCache}"
-                                          Command="{Binding ClearCacheCommand}" />
-                    <atom:HyperLinkButton Content="{Binding Loc.OpenConfigFolder}"
-                                          Command="{Binding OpenConfigFolderCommand}" />
-                    <atom:HyperLinkButton Content="{Binding Loc.GitHub}"
-                                          ToolTip.Tip="{Binding GitHubUrl}"
-                                          Command="{Binding OpenGitHubCommand}" />
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <atom:HyperLinkButton Content="{Binding Loc.Hotkey}"
+                                              Command="{Binding ShowHotkeysCommand}" />
+                        <atom:HyperLinkButton Content="{Binding Loc.ClearCache}"
+                                              Command="{Binding ClearCacheCommand}" />
+                        <atom:HyperLinkButton Content="{Binding Loc.OpenConfigFolder}"
+                                              Command="{Binding OpenConfigFolderCommand}" />
+                        <atom:HyperLinkButton Content="{Binding Loc.GitHub}"
+                                              ToolTip.Tip="{Binding GitHubUrl}"
+                                              Command="{Binding OpenGitHubCommand}" />
+                    </StackPanel>
                 </StackPanel>
             </atom:Card>
         </StackPanel>

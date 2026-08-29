@@ -212,6 +212,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
         TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.TitleBarFrameBackgroundProperty, SharedTokenKind.ColorBgContainer);
         TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.TransparencyBackgroundFallbackProperty, SharedTokenKind.ColorBgLayout);
         TokenResourceBinder.CreateGlobalTokenBinding(window, AtomWindow.ForegroundProperty, SharedTokenKind.ColorText);
+        window.Icon = AppAssets.WindowIcon;
     }
 
     private static Task<bool> ShowMessageAsync(string title, string message, bool showCancel)

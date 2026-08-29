@@ -40,7 +40,7 @@ public partial class SettingsViewModel : ViewModelBase
         ];
         FontOptions.Add(FontChoice.CreateDefault(Loc.FontDefault));
         LoadFrom(owner.Settings);
-        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.1";
+        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.2";
         _ready = true;
     }
 
