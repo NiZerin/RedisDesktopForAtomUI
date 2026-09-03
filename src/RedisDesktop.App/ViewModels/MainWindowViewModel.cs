@@ -78,7 +78,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 Settings.ThemeMode = Settings.IsDarkTheme ? "dark" : "system";
             }
 
+            Settings.Language = UiLanguages.Normalize(Settings.Language);
             Loc.SetLanguage(Settings.Language);
+            UiLanguages.ApplyAtomUi(Settings.Language);
             _themeService.Apply(Settings);
             ApplyAppearance(Settings);
             var connections = await _connectionStore.LoadAsync();
@@ -156,7 +158,9 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         vm.ApplyTo(Settings);
+        Settings.Language = UiLanguages.Normalize(Settings.Language);
         Loc.SetLanguage(Settings.Language);
+        UiLanguages.ApplyAtomUi(Settings.Language);
         _themeService.Apply(Settings);
         ApplyAppearance(Settings);
         await PersistSettingsAsync();
@@ -198,6 +202,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await _connectionStore.SaveAsync([]);
         Settings = new AppSettings { SideBarWidth = SideBarWidth };
         Loc.SetLanguage(Settings.Language);
+        UiLanguages.ApplyAtomUi(Settings.Language);
         _themeService.Apply(Settings);
         ApplyAppearance(Settings);
         await PersistSettingsAsync();

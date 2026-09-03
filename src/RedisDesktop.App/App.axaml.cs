@@ -21,7 +21,7 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
         this.UseAtomUI(builder =>
         {
-            builder.UseLanguages(LanguageTags.ZhCN, [LanguageTags.ZhCN, LanguageTags.EnUS]);
+            builder.UseLanguages(LanguageTags.ZhCN, UiLanguages.AtomUiTags);
             builder.WithInitialTheme(IThemeManager.DEFAULT_THEME_ID);
             builder.UseAlibabaSansFont();
             builder.UseDesktopControls();

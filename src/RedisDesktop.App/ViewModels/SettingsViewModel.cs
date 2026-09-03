@@ -33,14 +33,12 @@ public partial class SettingsViewModel : ViewModelBase
             new SettingChoice("light", Loc.ThemeLight),
             new SettingChoice("dark", Loc.ThemeDark)
         ];
-        LanguageOptions =
-        [
-            new SettingChoice("zh-CN", "简体中文"),
-            new SettingChoice("en-US", "English")
-        ];
+        LanguageOptions = UiLanguages.All
+            .Select(language => new SettingChoice(language.Code, language.Label))
+            .ToList();
         FontOptions.Add(FontChoice.CreateDefault(Loc.FontDefault));
         LoadFrom(owner.Settings);
-        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.2";
+        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.3";
         _ready = true;
     }
 
@@ -91,7 +89,7 @@ public partial class SettingsViewModel : ViewModelBase
         var theme = SelectedTheme?.Value ?? "system";
         settings.ThemeMode = theme;
         settings.IsDarkTheme = string.Equals(theme, "dark", StringComparison.OrdinalIgnoreCase);
-        settings.Language = SelectedLanguage?.Value ?? "zh-CN";
+        settings.Language = UiLanguages.Normalize(SelectedLanguage?.Value);
         settings.ZoomFactor = (double)ZoomFactor;
         settings.ScanCount = (int)ScanCount;
         settings.FontFamilies = SelectedFont is null || SelectedFont.IsDefault
@@ -123,7 +121,7 @@ public partial class SettingsViewModel : ViewModelBase
                 FontOptions.RemoveAt(i);
             }
 
-            foreach (var font in UiFontCatalog.ListChoices(Loc.FontDefault, !Loc.IsEnglish).Skip(1))
+            foreach (var font in UiFontCatalog.ListChoices(Loc.FontDefault, Loc.PreferLocalizedFontNames).Skip(1))
             {
                 FontOptions.Add(font);
             }
@@ -220,8 +218,9 @@ public partial class SettingsViewModel : ViewModelBase
             : settings.ThemeMode;
         SelectedTheme = ThemeOptions.FirstOrDefault(x => string.Equals(x.Value, mode, StringComparison.OrdinalIgnoreCase))
                         ?? ThemeOptions[0];
-        var language = settings.Language.StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "en-US" : "zh-CN";
-        SelectedLanguage = LanguageOptions.First(x => x.Value == language);
+        var language = UiLanguages.Normalize(settings.Language);
+        SelectedLanguage = LanguageOptions.FirstOrDefault(x => x.Value == language)
+                           ?? LanguageOptions.First(x => x.Value == UiLanguages.DefaultCode);
         ZoomFactor = (decimal)Math.Clamp(settings.ZoomFactor <= 0 ? 1 : settings.ZoomFactor, 0.5, 2.0);
         ScanCount = Math.Clamp(settings.ScanCount <= 0 ? 200 : settings.ScanCount, 10, 20000);
         SelectedFont = FindFont(settings.FontFamilies?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x)));
