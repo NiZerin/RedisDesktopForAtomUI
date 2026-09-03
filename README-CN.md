@@ -40,7 +40,7 @@ macOS / Linux 可从源码自行 `dotnet publish`（见下方），暂无官方�
 - **Viewer**：Text / JSON / Hex / Gzip / Deflate / Brotli
 - **Status**：INFO 首页（版本 / 内存 / 客户端 / Keyspace），可自动刷新
 - **CLI / Pub/Sub / 命令日志**：历史与补全；订阅走独立 Tab；日志脱敏 `AUTH`，不记 `PING`
-- **界面**：13 种语言（与 Another Redis Desktop Manager 一致）；浅色 / 深色 / 跟随系统；缩放与字体；侧栏宽度退出后保持
+- **界面**：13 种语言；浅色 / 深色 / 跟随系统；缩放与字体；侧栏宽度退出后保持
 
 ## 使用
 

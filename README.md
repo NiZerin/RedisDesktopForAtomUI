@@ -40,7 +40,7 @@ macOS and Linux can be published from source with `dotnet publish` (see below). 
 - **Viewer**: Text / JSON / Hex / Gzip / Deflate / Brotli
 - **Status**: INFO home (version / memory / clients / keyspace) with optional auto-refresh
 - **CLI / Pub/Sub / command log**: history and completion; subscriptions use a dedicated tab; `AUTH` is masked in the log; `PING` is not recorded
-- **UI**: 13 languages (same set as Another Redis Desktop Manager); light / dark / follow system; zoom and font; sidebar width is remembered
+- **UI**: 13 languages; light / dark / follow system; zoom and font; sidebar width is remembered
 
 ## Usage
 
