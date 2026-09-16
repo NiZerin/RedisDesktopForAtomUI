@@ -4,7 +4,8 @@
              xmlns:vm="using:RedisDesktop.App.ViewModels"
              x:Class="RedisDesktop.App.Views.UpdateDownloadView"
              x:DataType="vm:UpdateDownloadViewModel"
-             MinWidth="420">
+             MinWidth="420"
+             Padding="4,0,4,4">
     <atom:Space Orientation="Vertical" SizeType="Middle">
         <atom:TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
         <atom:ProgressBar Minimum="0"

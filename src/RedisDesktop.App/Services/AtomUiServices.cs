@@ -218,7 +218,8 @@ public sealed class AtomUiUserPrompt : IUserPrompt
                 IsClosable = true,
                 IsDragMovable = true,
                 IsMaximizable = false,
-                DialogHostType = DialogHostType.Window,
+                IsMinimizable = false,
+                DialogHostType = DialogHostType.Overlay,
                 HostMinWidth = 460,
                 HostMaxWidth = 620
             },
@@ -244,7 +245,8 @@ public sealed class AtomUiUserPrompt : IUserPrompt
                 IsClosable = false,
                 IsDragMovable = true,
                 IsMaximizable = false,
-                DialogHostType = DialogHostType.Window,
+                IsMinimizable = false,
+                DialogHostType = DialogHostType.Overlay,
                 HostMinWidth = 440,
                 HostMaxWidth = 560
             },
@@ -266,7 +268,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             {
                 Title = title,
                 Style = MessageBoxStyle.Information,
-                HostType = DialogHostType.Window,
+                HostType = DialogHostType.Overlay,
                 IsDragMovable = true,
                 MinWidth = 420,
                 MaxWidth = 560,
