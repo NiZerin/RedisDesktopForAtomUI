@@ -15,6 +15,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IRedisSessionFactory _sessionFactory;
     private readonly IUserPrompt _prompt;
     private readonly IThemeService _themeService;
+    private readonly IAppUpdateService _updates;
 
     public MainWindowViewModel(
         IConnectionStore connectionStore,
@@ -23,7 +24,8 @@ public partial class MainWindowViewModel : ViewModelBase
         IRedisSessionFactory sessionFactory,
         IUserPrompt prompt,
         IThemeService themeService,
-        ICommandLog commandLog)
+        ICommandLog commandLog,
+        IAppUpdateService updates)
     {
         _connectionStore = connectionStore;
         _settingsStore = settingsStore;
@@ -31,6 +33,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _sessionFactory = sessionFactory;
         _prompt = prompt;
         _themeService = themeService;
+        _updates = updates;
         Aside = new AsideViewModel(this);
         Workspace = new WorkspaceViewModel(this);
         CommandLog = new CommandLogViewModel(commandLog, this);
@@ -65,6 +68,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public IUserPrompt Prompt => _prompt;
 
+    public IAppUpdateService Updates => _updates;
+
     public int ScanCount => Math.Clamp(Settings.ScanCount <= 0 ? 200 : Settings.ScanCount, 10, 20_000);
 
     public async Task InitializeAsync()
@@ -88,6 +93,8 @@ public partial class MainWindowViewModel : ViewModelBase
             StatusText = connections.Count == 0
                 ? Loc.T("新建一个连接以开始", "Create a connection to start")
                 : Loc.T($"已加载 {connections.Count} 个连接", $"Loaded {connections.Count} connections");
+            FinishPendingUpdateIfCurrent();
+            _ = CheckForUpdatesOnStartupAsync();
         }
         catch (Exception ex)
         {
@@ -123,6 +130,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         Aside.StopAllHeartbeats();
         PersistSettings();
+        _updates.TryApplyPending(Settings);
     }
 
     [RelayCommand]
@@ -389,5 +397,111 @@ public partial class MainWindowViewModel : ViewModelBase
         await SaveConnectionsAsync();
         Workspace.Open(item, scanKeys: true);
         StatusText = $"{Loc.Connected} {item.Config.Name} / db{node.Index}";
+    }
+
+    public async Task<AppReleaseInfo?> CheckLatestReleaseAsync()
+    {
+        try
+        {
+            return await _updates.GetLatestAsync();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task PromptAndInstallUpdateAsync(AppReleaseInfo release, bool fromStartup)
+    {
+        if (fromStartup)
+        {
+            var choice = await _prompt.ShowUpdateAvailableAsync(new UpdateAvailableViewModel(Loc, release, _updates.CurrentVersion));
+            if (choice == AppUpdatePromptResult.Mute)
+            {
+                Settings.MuteUpdatePrompt = true;
+                await PersistSettingsAsync();
+                StatusText = Loc.T("已关闭启动更新提示，可在设置中手动更新。", "Startup update prompts are off. You can still update from Settings.");
+                return;
+            }
+
+            if (choice != AppUpdatePromptResult.Update)
+            {
+                return;
+            }
+        }
+
+        await _prompt.ShowUpdateRestartNoticeAsync(
+            Loc.UpdateAvailable,
+            Loc.T(
+                $"软件将下载 {release.Version}，并在重启后自动替换当前应用。",
+                $"The app will download {release.Version} and replace itself after restart."));
+        await DownloadPendingUpdateAsync(release);
+    }
+
+    private async Task DownloadPendingUpdateAsync(AppReleaseInfo release)
+    {
+        var download = new UpdateDownloadViewModel(Loc, release);
+        using var cts = new CancellationTokenSource();
+        download.CancelRequested += () => cts.Cancel();
+        var dialog = _prompt.ShowUpdateDownloadAsync(download);
+        try
+        {
+            var progress = new Progress<AppUpdateProgress>(sample =>
+            {
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => download.Report(sample));
+            });
+            var path = await _updates.DownloadAndExtractAsync(release, progress, cts.Token);
+            Settings.PendingUpdateVersion = release.Version;
+            Settings.PendingUpdatePackagePath = path;
+            await PersistSettingsAsync();
+            Avalonia.Threading.Dispatcher.UIThread.Post(download.Complete);
+            await dialog;
+            StatusText = _updates.CanReplaceRunningApp
+                ? Loc.T("更新已就绪，关闭程序后将自动替换并启动新版本。", "Update is ready. Close the app to replace files and relaunch.")
+                : Loc.T("更新包已下载。当前是开发运行，关闭后不会自动替换。", "Update package downloaded. Dev hosts cannot replace the running process.");
+        }
+        catch (OperationCanceledException)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => download.Fail(Loc.T("已取消下载", "Download cancelled")));
+            await dialog;
+        }
+        catch (Exception ex)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => download.Fail(ex.Message));
+            await dialog;
+            await _prompt.ErrorAsync(Loc.T("下载更新失败", "Failed to download the update"), ex);
+        }
+    }
+
+    private async Task CheckForUpdatesOnStartupAsync()
+    {
+        if (Settings.MuteUpdatePrompt)
+        {
+            return;
+        }
+
+        var latest = await CheckLatestReleaseAsync();
+        if (latest is null || !AppReleaseParser.IsNewer(latest.Version, _updates.CurrentVersion))
+        {
+            return;
+        }
+
+        await PromptAndInstallUpdateAsync(latest, fromStartup: true);
+    }
+
+    private void FinishPendingUpdateIfCurrent()
+    {
+        if (string.IsNullOrWhiteSpace(Settings.PendingUpdateVersion))
+        {
+            return;
+        }
+
+        if (AppReleaseParser.IsNewer(Settings.PendingUpdateVersion, _updates.CurrentVersion))
+        {
+            return;
+        }
+
+        _updates.ClearPending(Settings);
+        PersistSettings();
     }
 }

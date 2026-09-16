@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.UpdateAvailableView"
+             x:DataType="vm:UpdateAvailableViewModel"
+             MinWidth="420">
+    <atom:Space Orientation="Vertical" SizeType="Middle">
+        <atom:TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+        <atom:ScrollViewer MaxHeight="160">
+            <atom:TextBlock Opacity="0.75"
+                            TextWrapping="Wrap"
+                            Text="{Binding Notes}" />
+        </atom:ScrollViewer>
+        <atom:Space Orientation="Horizontal" SizeType="Small" HorizontalAlignment="Right">
+            <atom:Button Content="{Binding Loc.DontRemind}"
+                         Command="{Binding MuteCommand}" />
+            <atom:Button Content="{Binding Loc.Cancel}"
+                         Command="{Binding CancelCommand}" />
+            <atom:Button Content="{Binding Loc.UpdateNow}"
+                         ButtonType="Primary"
+                         Command="{Binding UpdateCommand}" />
+        </atom:Space>
+    </atom:Space>
+</UserControl>

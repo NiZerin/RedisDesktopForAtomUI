@@ -40,6 +40,7 @@ macOS and Linux can be published from source with `dotnet publish` (see below). 
 - **Viewer**: Text / JSON / Hex / Gzip / Deflate / Brotli
 - **Status**: INFO home (version / memory / clients / keyspace) with optional auto-refresh
 - **CLI / Pub/Sub / command log**: history and completion; subscriptions use a dedicated tab; `AUTH` is masked in the log; `PING` is not recorded
+- **Updates**: checks GitHub Releases on startup; update / later / don't remind; Settings can still install
 - **UI**: 13 languages; light / dark / follow system; zoom and font; sidebar width is remembered
 
 ## Usage
@@ -69,7 +70,7 @@ Settings live in `%AppData%\RedisDesktopForAtomUI\`. Passwords and SSH passphras
 
 ## Not included yet
 
-No Slow Log, memory analysis, dedicated RedisJSON / TimeSeries / Vector editors, custom script viewers, DUMP bulk import/export, or auto-update. CLI completion is static. `MONITOR` is rejected; use the Pub/Sub tab for subscriptions.
+No Slow Log, memory analysis, dedicated RedisJSON / TimeSeries / Vector editors, custom script viewers, or DUMP bulk import/export. CLI completion is static. `MONITOR` is rejected; use the Pub/Sub tab for subscriptions.
 
 ## Build from source
 

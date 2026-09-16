@@ -99,6 +99,16 @@ public sealed class UiStrings : INotifyPropertyChanged
     public string ConfigConnections => Get("config_connections", "连接配置", "Connections");
     public string AppName => "Redis Desktop";
     public string PreVersion => Get("pre_version", "当前版本", "Current Version");
+    public string LatestVersion => T("最新版本", "Latest Version");
+    public string CheckUpdate => T("检查更新", "Check for updates");
+    public string CheckingUpdate => T("正在检查更新…", "Checking for updates…");
+    public string UpdateCheckFailed => T("无法读取 GitHub 最新版本。", "Could not read the latest GitHub release.");
+    public string AlreadyLatest => T("已是最新版本", "You are on the latest version");
+    public string UpdateAvailable => T("发现新版本", "Update available");
+    public string UpdateNow => T("更新", "Update");
+    public string DontRemind => T("不再提示", "Don't remind");
+    public string DownloadingUpdate => T("正在下载更新", "Downloading update");
+    public string CheckUpdatesOnStartup => T("启动时检查更新", "Check for updates at startup");
     public string Hotkey => Get("hotkey", "快捷键", "Hot Key");
     public string ClearCache => Get("clear_cache", "清除缓存", "Clear Cache");
     public string ClearCacheTip => Get("clear_cache_tip", "当客户端出现问题时，该操作会删除所有连接和配置，用于恢复客户端。", "When the client misbehaves, this deletes all connections and settings to recover it.");

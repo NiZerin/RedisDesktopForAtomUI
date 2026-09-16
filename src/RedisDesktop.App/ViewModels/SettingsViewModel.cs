@@ -38,7 +38,9 @@ public partial class SettingsViewModel : ViewModelBase
             .ToList();
         FontOptions.Add(FontChoice.CreateDefault(Loc.FontDefault));
         LoadFrom(owner.Settings);
-        AppVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.0.3";
+        AppVersion = owner.Updates.CurrentVersion;
+        LatestVersionText = "-";
+        UpdateStatusText = Loc.CheckingUpdate;
         _ready = true;
     }
 
@@ -48,7 +50,7 @@ public partial class SettingsViewModel : ViewModelBase
 
     public string AppVersion { get; }
 
-    public string GitHubUrl { get; } = "https://github.com/NiZerin/RedisDesktopForAtomUI";
+    public string GitHubUrl { get; } = AppReleaseParser.GitHubUrl;
 
     public IReadOnlyList<SettingChoice> ThemeOptions { get; }
 
@@ -84,6 +86,31 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private decimal _scanCount = 200;
 
+    [ObservableProperty]
+    private bool _checkUpdatesOnStartup = true;
+
+    [ObservableProperty]
+    private string _latestVersionText = "-";
+
+    [ObservableProperty]
+    private string _updateStatusText = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanInstallUpdate))]
+    private bool _hasNewerVersion;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanInstallUpdate))]
+    private bool _isCheckingUpdate;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanInstallUpdate))]
+    private bool _isInstallingUpdate;
+
+    public bool CanInstallUpdate => HasNewerVersion && !IsCheckingUpdate && !IsInstallingUpdate;
+
+    private AppReleaseInfo? _latestRelease;
+
     public void ApplyTo(AppSettings settings)
     {
         var theme = SelectedTheme?.Value ?? "system";
@@ -95,6 +122,7 @@ public partial class SettingsViewModel : ViewModelBase
         settings.FontFamilies = SelectedFont is null || SelectedFont.IsDefault
             ? []
             : [SelectedFont.Name];
+        settings.MuteUpdatePrompt = !CheckUpdatesOnStartup;
     }
 
     public void RevertPreview()
@@ -137,6 +165,16 @@ public partial class SettingsViewModel : ViewModelBase
         }
     }
 
+    public void EnsureUpdates()
+    {
+        if (_latestRelease is not null || IsCheckingUpdate)
+        {
+            return;
+        }
+
+        _ = RefreshLatestAsync();
+    }
+
     [RelayCommand]
     private Task ExportConnectionsAsync() => Owner.ExportConnectionsCommand.ExecuteAsync(null);
 
@@ -164,6 +202,67 @@ public partial class SettingsViewModel : ViewModelBase
 
     [RelayCommand]
     private void OpenGitHub() => OpenPath(GitHubUrl);
+
+    [RelayCommand]
+    private Task RefreshLatestAsync() => CheckLatestAsync();
+
+    [RelayCommand]
+    private async Task InstallUpdateAsync()
+    {
+        if (_latestRelease is null || IsInstallingUpdate)
+        {
+            return;
+        }
+
+        IsInstallingUpdate = true;
+        try
+        {
+            await Owner.PromptAndInstallUpdateAsync(_latestRelease, fromStartup: false);
+            await CheckLatestAsync();
+        }
+        finally
+        {
+            IsInstallingUpdate = false;
+        }
+    }
+
+    private async Task CheckLatestAsync()
+    {
+        IsCheckingUpdate = true;
+        UpdateStatusText = Loc.CheckingUpdate;
+        HasNewerVersion = false;
+        try
+        {
+            var latest = await Owner.CheckLatestReleaseAsync();
+            _latestRelease = latest;
+            if (latest is null)
+            {
+                LatestVersionText = "-";
+                UpdateStatusText = Loc.UpdateCheckFailed;
+                return;
+            }
+
+            LatestVersionText = latest.Version;
+            if (AppReleaseParser.IsNewer(latest.Version, AppVersion))
+            {
+                HasNewerVersion = true;
+                UpdateStatusText = Loc.T($"发现新版本 {latest.Version}", $"New version {latest.Version} is available");
+            }
+            else
+            {
+                UpdateStatusText = Loc.AlreadyLatest;
+            }
+        }
+        catch
+        {
+            LatestVersionText = "-";
+            UpdateStatusText = Loc.UpdateCheckFailed;
+        }
+        finally
+        {
+            IsCheckingUpdate = false;
+        }
+    }
 
     private static void OpenPath(string path)
     {
@@ -223,6 +322,7 @@ public partial class SettingsViewModel : ViewModelBase
                            ?? LanguageOptions.First(x => x.Value == UiLanguages.DefaultCode);
         ZoomFactor = (decimal)Math.Clamp(settings.ZoomFactor <= 0 ? 1 : settings.ZoomFactor, 0.5, 2.0);
         ScanCount = Math.Clamp(settings.ScanCount <= 0 ? 200 : settings.ScanCount, 10, 20000);
+        CheckUpdatesOnStartup = !settings.MuteUpdatePrompt;
         SelectedFont = FindFont(settings.FontFamilies?.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x)));
     }
 
@@ -255,6 +355,9 @@ public partial class SettingsViewModel : ViewModelBase
             ScanCount = settings.ScanCount,
             Language = settings.Language,
             ZoomFactor = settings.ZoomFactor,
-            FontFamilies = [.. settings.FontFamilies ?? []]
+            FontFamilies = [.. settings.FontFamilies ?? []],
+            MuteUpdatePrompt = settings.MuteUpdatePrompt,
+            PendingUpdateVersion = settings.PendingUpdateVersion,
+            PendingUpdatePackagePath = settings.PendingUpdatePackagePath
         };
 }

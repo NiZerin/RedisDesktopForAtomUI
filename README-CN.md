@@ -40,6 +40,7 @@ macOS / Linux 可从源码自行 `dotnet publish`（见下方），暂无官方�
 - **Viewer**：Text / JSON / Hex / Gzip / Deflate / Brotli
 - **Status**：INFO 首页（版本 / 内存 / 客户端 / Keyspace），可自动刷新
 - **CLI / Pub/Sub / 命令日志**：历史与补全；订阅走独立 Tab；日志脱敏 `AUTH`，不记 `PING`
+- **更新**：启动时对照 GitHub 最新 Release；可更新 / 取消 / 不再提示；设置里仍可手动更新
 - **界面**：13 种语言；浅色 / 深色 / 跟随系统；缩放与字体；侧栏宽度退出后保持
 
 ## 使用
@@ -69,7 +70,7 @@ macOS / Linux 可从源码自行 `dotnet publish`（见下方），暂无官方�
 
 ## 尚未包含
 
-Slow Log、内存分析、RedisJSON / TimeSeries / Vector 专用编辑器、自定义脚本 Viewer、DUMP 批量导入导出、自动更新。CLI 目前是静态补全。`MONITOR` 已拒绝，订阅请用 Pub/Sub Tab。
+Slow Log、内存分析、RedisJSON / TimeSeries / Vector 专用编辑器、自定义脚本 Viewer、DUMP 批量导入导出。CLI 目前是静态补全。`MONITOR` 已拒绝，订阅请用 Pub/Sub Tab。
 
 ## 从源码构建
 

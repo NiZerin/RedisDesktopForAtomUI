@@ -200,6 +200,81 @@ public sealed class AtomUiUserPrompt : IUserPrompt
         return ok ? vm.Text : null;
     }
 
+    public async Task<AppUpdatePromptResult> ShowUpdateAvailableAsync(UpdateAvailableViewModel viewModel)
+    {
+        var owner = GetMainWindow();
+        if (owner is null)
+        {
+            return AppUpdatePromptResult.Cancel;
+        }
+
+        var result = await Dialog.ShowDialogModalAsync(
+            new UpdateAvailableView { DataContext = viewModel },
+            viewModel,
+            new DialogOptions
+            {
+                Title = viewModel.Loc.UpdateAvailable,
+                IsFooterVisible = false,
+                IsClosable = true,
+                IsDragMovable = true,
+                IsMaximizable = false,
+                DialogHostType = DialogHostType.Window,
+                HostMinWidth = 460,
+                HostMaxWidth = 620
+            },
+            owner);
+        return result is AppUpdatePromptResult choice ? choice : AppUpdatePromptResult.Cancel;
+    }
+
+    public async Task ShowUpdateDownloadAsync(UpdateDownloadViewModel viewModel)
+    {
+        var owner = GetMainWindow();
+        if (owner is null)
+        {
+            return;
+        }
+
+        await Dialog.ShowDialogModalAsync(
+            new UpdateDownloadView { DataContext = viewModel },
+            viewModel,
+            new DialogOptions
+            {
+                Title = viewModel.Loc.DownloadingUpdate,
+                IsFooterVisible = false,
+                IsClosable = false,
+                IsDragMovable = true,
+                IsMaximizable = false,
+                DialogHostType = DialogHostType.Window,
+                HostMinWidth = 440,
+                HostMaxWidth = 560
+            },
+            owner);
+    }
+
+    public async Task ShowUpdateRestartNoticeAsync(string title, string message)
+    {
+        var owner = GetMainWindow();
+        if (owner is null)
+        {
+            return;
+        }
+
+        await MessageBox.ShowMessageBoxModalAsync(
+            new AtomTextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+            null,
+            new MessageBoxOptions
+            {
+                Title = title,
+                Style = MessageBoxStyle.Information,
+                HostType = DialogHostType.Window,
+                IsDragMovable = true,
+                MinWidth = 420,
+                MaxWidth = 560,
+                OkButtonText = owner.DataContext is MainWindowViewModel vm ? vm.Loc.Ok : "OK"
+            },
+            owner);
+    }
+
     private static Avalonia.Controls.Window? GetMainWindow()
         => Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
             ? desktop.MainWindow

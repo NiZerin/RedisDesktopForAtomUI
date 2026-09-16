@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.UpdateDownloadView"
+             x:DataType="vm:UpdateDownloadViewModel"
+             MinWidth="420">
+    <atom:Space Orientation="Vertical" SizeType="Middle">
+        <atom:TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
+        <atom:ProgressBar Minimum="0"
+                          Maximum="100"
+                          Value="{Binding Percent}" />
+        <atom:Button HorizontalAlignment="Right"
+                     Content="{Binding Loc.Cancel}"
+                     IsEnabled="{Binding CanCancel}"
+                     Command="{Binding CancelCommand}" />
+    </atom:Space>
+</UserControl>

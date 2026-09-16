@@ -24,4 +24,13 @@ public sealed class AppSettings
     /// Preferred UI font names. Empty means the AtomUI default.
     /// </summary>
     public List<string> FontFamilies { get; set; } = [];
+
+    /// <summary>
+    /// When true, startup no longer shows the update dialog. Settings can still check and install.
+    /// </summary>
+    public bool MuteUpdatePrompt { get; set; }
+
+    public string? PendingUpdateVersion { get; set; }
+
+    public string? PendingUpdatePackagePath { get; set; }
 }

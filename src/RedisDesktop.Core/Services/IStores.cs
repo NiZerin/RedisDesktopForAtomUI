@@ -23,6 +23,24 @@ public interface ISecretProtector
     string Unprotect(string protectedText);
 }
 
+public interface IAppUpdateService
+{
+    string CurrentVersion { get; }
+
+    bool CanReplaceRunningApp { get; }
+
+    Task<AppReleaseInfo?> GetLatestAsync(CancellationToken cancellationToken = default);
+
+    Task<string> DownloadAndExtractAsync(
+        AppReleaseInfo release,
+        IProgress<AppUpdateProgress>? progress = null,
+        CancellationToken cancellationToken = default);
+
+    bool TryApplyPending(AppSettings settings);
+
+    void ClearPending(AppSettings settings);
+}
+
 public interface ICommandLog
 {
     IReadOnlyList<CommandLogEntry> Entries { get; }

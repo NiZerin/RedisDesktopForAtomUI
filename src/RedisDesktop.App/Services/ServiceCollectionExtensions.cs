@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAppSettingsStore, JsonAppSettingsStore>();
         services.AddSingleton<ICommandLog, MemoryCommandLog>();
         services.AddSingleton<IRedisSessionFactory, RedisSessionFactory>();
+        services.AddSingleton<IAppUpdateService, GitHubAppUpdateService>();
         services.AddSingleton<IUserPrompt, AtomUiUserPrompt>();
         services.AddSingleton<IThemeService, AtomUiThemeService>();
         services.AddSingleton<ViewModels.MainWindowViewModel>();

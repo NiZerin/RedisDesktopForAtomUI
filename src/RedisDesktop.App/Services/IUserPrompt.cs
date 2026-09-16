@@ -26,6 +26,12 @@ public interface IUserPrompt
     Task<string?> PickOpenFileAsync(string title);
 
     Task<string?> PromptTextAsync(string title, string message, string? initial = null);
+
+    Task<AppUpdatePromptResult> ShowUpdateAvailableAsync(UpdateAvailableViewModel viewModel);
+
+    Task ShowUpdateDownloadAsync(UpdateDownloadViewModel viewModel);
+
+    Task ShowUpdateRestartNoticeAsync(string title, string message);
 }
 
 public interface IThemeService
