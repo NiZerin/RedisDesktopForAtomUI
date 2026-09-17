@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RedisDesktop.App;
@@ -38,6 +39,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Workspace = new WorkspaceViewModel(this);
         CommandLog = new CommandLogViewModel(commandLog, this);
         Loc = new UiStrings();
+        StatusText = Loc.T("正在加载…", "Loading…");
     }
 
     public UiStrings Loc { get; }
@@ -54,13 +56,16 @@ public partial class MainWindowViewModel : ViewModelBase
     private double _sideBarWidth = 280;
 
     [ObservableProperty]
-    private string _statusText = "就绪";
+    private string _statusText = "正在加载…";
 
     [ObservableProperty]
     private double _zoomFactor = 1;
 
     [ObservableProperty]
     private FontFamily? _uiFontFamily;
+
+    [ObservableProperty]
+    private bool _isInitializing = true;
 
     public ISecretProtector Secrets => _secretProtector;
 
@@ -72,22 +77,24 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public int ScanCount => Math.Clamp(Settings.ScanCount <= 0 ? 200 : Settings.ScanCount, 10, 20_000);
 
+    private int _initializeStarted;
+    private bool _settingsLoaded;
+
     public async Task InitializeAsync()
     {
+        if (Interlocked.Exchange(ref _initializeStarted, 1) == 1)
+        {
+            return;
+        }
+
         try
         {
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
             Settings = await _settingsStore.LoadAsync();
-            SideBarWidth = Settings.SideBarWidth < 220 ? 280 : Settings.SideBarWidth;
-            if (string.IsNullOrWhiteSpace(Settings.ThemeMode))
-            {
-                Settings.ThemeMode = Settings.IsDarkTheme ? "dark" : "system";
-            }
+            ApplyLoadedSettings();
+            _settingsLoaded = true;
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
 
-            Settings.Language = UiLanguages.Normalize(Settings.Language);
-            Loc.SetLanguage(Settings.Language);
-            UiLanguages.ApplyAtomUi(Settings.Language);
-            _themeService.Apply(Settings);
-            ApplyAppearance(Settings);
             var connections = await _connectionStore.LoadAsync();
             Aside.Load(connections);
             StatusText = connections.Count == 0
@@ -95,10 +102,43 @@ public partial class MainWindowViewModel : ViewModelBase
                 : Loc.T($"已加载 {connections.Count} 个连接", $"Loaded {connections.Count} connections");
             FinishPendingUpdateIfCurrent();
             _ = CheckForUpdatesOnStartupAsync();
+            _ = Task.Run(HealInstallCopies);
         }
         catch (Exception ex)
         {
+            AppLog.Error("Startup", ex);
             StatusText = Loc.T($"启动失败：{ex.Message}", $"Startup failed: {ex.Message}");
+        }
+        finally
+        {
+            IsInitializing = false;
+        }
+    }
+
+    private void ApplyLoadedSettings()
+    {
+        SideBarWidth = Settings.SideBarWidth < 220 ? 280 : Settings.SideBarWidth;
+        if (string.IsNullOrWhiteSpace(Settings.ThemeMode))
+        {
+            Settings.ThemeMode = Settings.IsDarkTheme ? "dark" : "system";
+        }
+
+        Settings.Language = UiLanguages.Normalize(Settings.Language);
+        Loc.SetLanguage(Settings.Language);
+        UiLanguages.ApplyAtomUi(Settings.Language);
+        _themeService.Apply(Settings);
+        ApplyAppearance(Settings);
+    }
+
+    private static void HealInstallCopies()
+    {
+        try
+        {
+            AppUpdateApplier.ReplaceOutdatedInstallCopies();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("UpdateHeal", ex);
         }
     }
 
@@ -109,6 +149,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public void PersistSettings()
     {
+        if (!_settingsLoaded)
+        {
+            return;
+        }
+
         Settings.SideBarWidth = SideBarWidth < 220 ? 280 : SideBarWidth;
         try
         {
@@ -122,6 +167,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public async Task PersistSettingsAsync()
     {
+        if (!_settingsLoaded)
+        {
+            return;
+        }
+
         Settings.SideBarWidth = SideBarWidth < 220 ? 280 : SideBarWidth;
         await _settingsStore.SaveAsync(Settings);
     }
@@ -129,6 +179,11 @@ public partial class MainWindowViewModel : ViewModelBase
     public void Shutdown()
     {
         Aside.StopAllHeartbeats();
+        if (!_settingsLoaded)
+        {
+            return;
+        }
+
         PersistSettings();
         _updates.TryApplyPending(Settings);
     }
@@ -208,7 +263,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await Aside.DisconnectAllAsync();
         Aside.Load([]);
         await _connectionStore.SaveAsync([]);
-        Settings = new AppSettings { SideBarWidth = SideBarWidth };
+        Settings = Settings.ResetUserData(SideBarWidth);
         Loc.SetLanguage(Settings.Language);
         UiLanguages.ApplyAtomUi(Settings.Language);
         _themeService.Apply(Settings);
@@ -453,6 +508,7 @@ public partial class MainWindowViewModel : ViewModelBase
             var path = await _updates.DownloadAndExtractAsync(release, progress, cts.Token);
             Settings.PendingUpdateVersion = release.Version;
             Settings.PendingUpdatePackagePath = path;
+            Settings.PendingUpdateTargetExe = Environment.ProcessPath;
             await PersistSettingsAsync();
             Avalonia.Threading.Dispatcher.UIThread.Post(download.Complete);
             await dialog;
@@ -501,6 +557,7 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        AppUpdateApplier.ReplaceOutdatedInstallCopies();
         _updates.ClearPending(Settings);
         PersistSettings();
     }

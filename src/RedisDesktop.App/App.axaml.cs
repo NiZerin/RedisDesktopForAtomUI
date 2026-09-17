@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using RedisDesktop.App.ViewModels;
 using RedisDesktop.App.Views;
+using RedisDesktop.Infrastructure;
 
 namespace RedisDesktop.App;
 
@@ -33,6 +34,7 @@ public partial class App : Application
     {
         Dispatcher.UIThread.UnhandledException += (_, e) =>
         {
+            AppLog.Error("UI", e.Exception);
             e.Handled = true;
         };
 
@@ -48,7 +50,10 @@ public partial class App : Application
                 DataContext = viewModel
             };
             desktop.MainWindow = window;
-            window.Opened += async (_, _) => await viewModel.InitializeAsync();
+            window.Opened += (_, _) =>
+            {
+                Dispatcher.UIThread.Post(() => _ = viewModel.InitializeAsync(), DispatcherPriority.Background);
+            };
             desktop.ShutdownRequested += (_, _) => viewModel.Shutdown();
         }
 

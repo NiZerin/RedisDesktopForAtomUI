@@ -21,7 +21,9 @@
         <LayoutTransformControl.LayoutTransform>
             <ScaleTransform ScaleX="{Binding ZoomFactor}" ScaleY="{Binding ZoomFactor}" />
         </LayoutTransformControl.LayoutTransform>
-    <DockPanel Background="{atom:SharedTokenResource ColorBgLayout}">
+    <Grid Background="{atom:SharedTokenResource ColorBgLayout}">
+    <DockPanel Background="{atom:SharedTokenResource ColorBgLayout}"
+               IsEnabled="{Binding !IsInitializing}">
         <atom:TextBlock DockPanel.Dock="Bottom"
                         Margin="12,6"
                         Opacity="0.7"
@@ -38,5 +40,22 @@
             <views:WorkspaceView DataContext="{Binding Workspace}" />
         </atom:Splitter>
     </DockPanel>
+        <Panel IsVisible="{Binding IsInitializing}"
+               IsHitTestVisible="True">
+            <Border Background="{atom:SharedTokenResource ColorBgLayout}"
+                    Opacity="0.82" />
+            <atom:Space HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical"
+                        SizeType="Middle">
+                <atom:ProgressBar Width="220"
+                                  IsIndeterminate="True" />
+                <atom:TextBlock HorizontalAlignment="Center"
+                                Opacity="0.75"
+                                Foreground="{atom:SharedTokenResource ColorTextSecondary}"
+                                Text="{Binding StatusText}" />
+            </atom:Space>
+        </Panel>
+    </Grid>
     </LayoutTransformControl>
 </atom:Window>

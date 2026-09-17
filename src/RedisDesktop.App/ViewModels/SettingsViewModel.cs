@@ -358,6 +358,7 @@ public partial class SettingsViewModel : ViewModelBase
             FontFamilies = [.. settings.FontFamilies ?? []],
             MuteUpdatePrompt = settings.MuteUpdatePrompt,
             PendingUpdateVersion = settings.PendingUpdateVersion,
-            PendingUpdatePackagePath = settings.PendingUpdatePackagePath
+            PendingUpdatePackagePath = settings.PendingUpdatePackagePath,
+            PendingUpdateTargetExe = settings.PendingUpdateTargetExe
         };
 }

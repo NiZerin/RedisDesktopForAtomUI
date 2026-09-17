@@ -20,6 +20,19 @@ public static class AppPaths
 
     public static string SettingsFile => Path.Combine(Root, "settings.json");
 
+    public static string LogsDirectory
+    {
+        get
+        {
+            var dir = Path.Combine(Root, "logs");
+            Directory.CreateDirectory(dir);
+            return dir;
+        }
+    }
+
+    public static string LogFile(DateTime date)
+        => Path.Combine(LogsDirectory, date.ToString("yyyy-MM-dd") + ".log");
+
     public static string UpdatesDirectory
     {
         get
