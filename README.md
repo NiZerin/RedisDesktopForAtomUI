@@ -39,6 +39,8 @@ macOS and Linux can be published from source with `dotnet publish` (see below). 
 - **Editing**: paginated create/update/delete for String, Hash, List, Set, ZSet, and Stream; TTL; writes disabled on read-only connections
 - **Viewer**: Text / JSON / Hex / Gzip / Deflate / Brotli
 - **Status**: INFO home (version / memory / clients / keyspace) with optional auto-refresh
+- **Slow Log / Memory analysis**: connection menu tabs; Cluster reads each master; memory scan can be paused and limited to a key prefix
+- **Benchmark**: dedicated connections (not the browse session); PING/SET/GET/INCR/list/hash; live QPS + latency histogram; cleanup `__rdbench:` keys; disabled on read-only connections
 - **CLI / Pub/Sub / command log**: history and completion; subscriptions use a dedicated tab; `AUTH` is masked in the log; `PING` is not recorded
 - **Updates**: checks GitHub Releases on startup; update / later / don't remind; Settings can still install
 - **UI**: 13 languages; light / dark / follow system; zoom and font; sidebar width is remembered
@@ -48,7 +50,7 @@ macOS and Linux can be published from source with `dotnet publish` (see below). 
 1. Click **New connection**, enter host / port, choose Standalone, Sentinel, or Cluster, and enable SSL / SSH if needed
 2. Expand the connection on the left. For non-cluster servers, switch databases from the DB dropdown, then search and scan keys in the connection pane
 3. Status opens on the right. Click a key to open a detail tab. Closing a tab **does not** disconnect — use **Disconnect** on the connection context menu
-4. Open CLI / Pub/Sub from the connection header or context menu. Open the command log with the clock button or `Ctrl+G`
+4. Open CLI / Pub/Sub / Slow Log / Memory analysis / Benchmark from the connection header or context menu. Open the command log with the clock button or `Ctrl+G`
 
 | Shortcut | Action |
 |----------|--------|
@@ -70,7 +72,7 @@ Settings live in `%AppData%\RedisDesktopForAtomUI\`. Passwords and SSH passphras
 
 ## Not included yet
 
-No Slow Log, memory analysis, dedicated RedisJSON / TimeSeries / Vector editors, custom script viewers, or DUMP bulk import/export. CLI completion is static. `MONITOR` is rejected; use the Pub/Sub tab for subscriptions.
+No dedicated RedisJSON / TimeSeries / Vector editors, custom script viewers, or DUMP bulk import/export. CLI completion is static. `MONITOR` is rejected; use the Pub/Sub tab for subscriptions.
 
 ## Build from source
 

@@ -50,6 +50,77 @@ public sealed class RedisSessionFactory : IRedisSessionFactory
         }
     }
 
+    internal async Task<BenchmarkWorkerPool> OpenWorkerPoolAsync(
+        ConnectionConfig config,
+        ConnectionSecrets secrets,
+        int workers,
+        CancellationToken cancellationToken = default)
+    {
+        workers = Math.Clamp(workers, 1, BenchmarkLimits.MaxConcurrency);
+        var muxes = new List<ConnectionMultiplexer>(workers);
+        SshTunnel? tunnel = null;
+        try
+        {
+            var (first, openedTunnel) = await ConnectMultiplexerAsync(config, secrets, cancellationToken)
+                .ConfigureAwait(false);
+            muxes.Add(first);
+            tunnel = openedTunnel;
+            for (var i = 1; i < workers; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                muxes.Add(await ConnectAdditionalAsync(config, secrets, tunnel, cancellationToken).ConfigureAwait(false));
+            }
+
+            var database = config.Kind == RedisDeploymentKind.Cluster ? 0 : Math.Max(0, config.Database);
+            return new BenchmarkWorkerPool(muxes, tunnel, database);
+        }
+        catch
+        {
+            foreach (var mux in muxes)
+            {
+                try
+                {
+                    await mux.CloseAsync().ConfigureAwait(false);
+                    mux.Dispose();
+                }
+                catch
+                {
+                    // best-effort cleanup
+                }
+            }
+
+            if (tunnel is not null)
+            {
+                await tunnel.DisposeAsync().ConfigureAwait(false);
+            }
+
+            throw;
+        }
+    }
+
+    private static async Task<ConnectionMultiplexer> ConnectAdditionalAsync(
+        ConnectionConfig config,
+        ConnectionSecrets secrets,
+        SshTunnel? tunnel,
+        CancellationToken cancellationToken)
+    {
+        if (config.Kind == RedisDeploymentKind.Cluster && tunnel is not null)
+        {
+            var clusterOptions = CreateBaseOptions(config, secrets);
+            clusterOptions.EndPoints.Clear();
+            foreach (var local in tunnel.AdvertisedToLocal.Values)
+            {
+                clusterOptions.EndPoints.Add(local.Host, local.Port);
+            }
+
+            AttachSshClusterEndpointMap(clusterOptions, tunnel);
+            return await ConnectCoreAsync(clusterOptions, config, secrets, cancellationToken).ConfigureAwait(false);
+        }
+
+        var options = CreateOptions(config, secrets, tunnel);
+        return await ConnectCoreAsync(options, config, secrets, cancellationToken).ConfigureAwait(false);
+    }
+
     private static async Task<(ConnectionMultiplexer Mux, SshTunnel? Tunnel)> ConnectMultiplexerAsync(
         ConnectionConfig config,
         ConnectionSecrets secrets,
@@ -374,6 +445,7 @@ internal sealed class RedisSession : IRedisSession
         Values = new RedisValueService(this);
         Cli = new RedisCliExecutor(this);
         PubSub = new RedisPubSubService(this);
+        Observability = new RedisObservabilityService(this);
     }
 
     public ConnectionConfig Config { get; }
@@ -387,6 +459,8 @@ internal sealed class RedisSession : IRedisSession
     public ICliExecutor Cli { get; }
 
     public IPubSubService PubSub { get; }
+
+    public IObservability Observability { get; }
 
     public event EventHandler<CommandLogEntry>? CommandExecuted;
 
@@ -546,7 +620,7 @@ internal sealed class RedisSession : IRedisSession
             : _multiplexer.GetEndPoints().Select(ep => _multiplexer.GetServer(ep)).ToArray();
     }
 
-    private string FormatNodeName(IServer server)
+    internal string FormatNodeName(IServer server)
     {
         var endpoint = ClusterNodesParser.FormatEndpoint(server.EndPoint);
         if (_tunnel is null)
@@ -601,26 +675,43 @@ internal sealed class RedisSession : IRedisSession
         }
     }
 
-    internal async Task<T> RunAsync<T>(string command, string? details, Func<Task<T>> action, CancellationToken cancellationToken)
+    internal async Task<T> RunAsync<T>(
+        string command,
+        string? details,
+        Func<Task<T>> action,
+        CancellationToken cancellationToken,
+        bool log = true)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             var result = await action().WaitAsync(cancellationToken).ConfigureAwait(false);
             sw.Stop();
-            RaiseLog(command, Mask(command, details), sw.Elapsed.TotalMilliseconds, success: true, error: null);
+            if (log)
+            {
+                RaiseLog(command, Mask(command, details), sw.Elapsed.TotalMilliseconds, success: true, error: null);
+            }
+
             return result;
         }
         catch (ReadOnlyException)
         {
             sw.Stop();
-            RaiseLog(command, Mask(command, details), sw.Elapsed.TotalMilliseconds, success: false, error: "readonly");
+            if (log)
+            {
+                RaiseLog(command, Mask(command, details), sw.Elapsed.TotalMilliseconds, success: false, error: "readonly");
+            }
+
             throw;
         }
         catch (Exception ex)
         {
             sw.Stop();
-            RaiseLog(command, Mask(command, details), sw.Elapsed.TotalMilliseconds, success: false, error: ex.Message);
+            if (log)
+            {
+                RaiseLog(command, Mask(command, details), sw.Elapsed.TotalMilliseconds, success: false, error: ex.Message);
+            }
+
             throw new RedisDesktop.Core.RedisCommandException(ex.Message, ex);
         }
     }

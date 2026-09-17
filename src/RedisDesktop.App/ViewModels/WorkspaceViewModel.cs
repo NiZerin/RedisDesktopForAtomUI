@@ -124,6 +124,71 @@ public partial class WorkspaceViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
+    public async Task OpenSlowLogAsync(ConnectionItemViewModel connection)
+    {
+        if (connection.Session is null)
+        {
+            return;
+        }
+
+        var existing = Tabs.OfType<SlowLogTabViewModel>().FirstOrDefault(x => x.Connection == connection);
+        if (existing is null)
+        {
+            existing = new SlowLogTabViewModel(_owner, connection);
+            Tabs.Add(existing);
+            SelectedTab = existing;
+            NotifyTabs();
+            await existing.RefreshCommand.ExecuteAsync(null);
+            return;
+        }
+
+        SelectedTab = existing;
+        NotifyTabs();
+    }
+
+    public async Task OpenMemoryAnalysisAsync(ConnectionItemViewModel connection, string? prefix = null)
+    {
+        if (connection.Session is null)
+        {
+            return;
+        }
+
+        var key = prefix?.Trim() ?? string.Empty;
+        var existing = Tabs.OfType<MemoryAnalysisTabViewModel>()
+            .FirstOrDefault(x => x.Connection == connection && string.Equals(x.Prefix, key, StringComparison.Ordinal));
+        if (existing is null)
+        {
+            existing = new MemoryAnalysisTabViewModel(_owner, connection, key);
+            Tabs.Add(existing);
+            SelectedTab = existing;
+            NotifyTabs();
+            await existing.RestartCommand.ExecuteAsync(null);
+            return;
+        }
+
+        SelectedTab = existing;
+        NotifyTabs();
+    }
+
+    public Task OpenBenchmarkAsync(ConnectionItemViewModel connection)
+    {
+        if (connection.Session is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var existing = Tabs.OfType<BenchmarkTabViewModel>().FirstOrDefault(x => x.Connection == connection);
+        if (existing is null)
+        {
+            existing = new BenchmarkTabViewModel(_owner, connection);
+            Tabs.Add(existing);
+        }
+
+        SelectedTab = existing;
+        NotifyTabs();
+        return Task.CompletedTask;
+    }
+
     public async Task CloseAsync(ConnectionItemViewModel connection)
     {
         var toRemove = Tabs.Where(x => x.Connection == connection).ToList();
@@ -137,6 +202,16 @@ public partial class WorkspaceViewModel : ViewModelBase
             if (tab is PubSubTabViewModel pubSub)
             {
                 await pubSub.StopAsync();
+            }
+
+            if (tab is MemoryAnalysisTabViewModel memory)
+            {
+                memory.Cancel();
+            }
+
+            if (tab is BenchmarkTabViewModel benchmark)
+            {
+                benchmark.Cancel();
             }
 
             Tabs.Remove(tab);
@@ -157,6 +232,16 @@ public partial class WorkspaceViewModel : ViewModelBase
         foreach (var tab in Tabs.OfType<PubSubTabViewModel>().ToList())
         {
             await tab.StopAsync();
+        }
+
+        foreach (var tab in Tabs.OfType<MemoryAnalysisTabViewModel>().ToList())
+        {
+            tab.Cancel();
+        }
+
+        foreach (var tab in Tabs.OfType<BenchmarkTabViewModel>().ToList())
+        {
+            tab.Cancel();
         }
 
         foreach (var tab in Tabs.OfType<ConnectionWorkspaceViewModel>())
@@ -185,6 +270,16 @@ public partial class WorkspaceViewModel : ViewModelBase
         if (tab is PubSubTabViewModel pubSubTab)
         {
             await pubSubTab.StopAsync();
+        }
+
+        if (tab is MemoryAnalysisTabViewModel memoryTab)
+        {
+            memoryTab.Cancel();
+        }
+
+        if (tab is BenchmarkTabViewModel benchmarkTab)
+        {
+            benchmarkTab.Cancel();
         }
 
         Tabs.Remove(tab);

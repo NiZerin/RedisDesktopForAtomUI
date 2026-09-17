@@ -1,0 +1,190 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             xmlns:controls="using:RedisDesktop.App.Controls"
+             x:Class="RedisDesktop.App.Views.BenchmarkTabView"
+             x:DataType="vm:BenchmarkTabViewModel">
+    <atom:Card Margin="12" SizeType="Small">
+        <atom:Card.Header>
+            <DockPanel>
+                <atom:Space DockPanel.Dock="Right" SizeType="Small">
+                    <atom:Button Content="{Binding Loc.BenchmarkCleanup}"
+                                 Command="{Binding CleanupCommand}"
+                                 IsEnabled="{Binding CanCleanup}" />
+                    <atom:Button Content="{Binding Loc.Stop}"
+                                 IsDanger="True"
+                                 Command="{Binding StopCommand}"
+                                 IsVisible="{Binding CanStop}" />
+                    <atom:Button Content="{Binding Loc.Begin}"
+                                 ButtonType="Primary"
+                                 Command="{Binding StartCommand}"
+                                 IsEnabled="{Binding CanStart}"
+                                 IsLoading="{Binding IsRunning}" />
+                </atom:Space>
+                <atom:Space SizeType="Small">
+                    <atom:TextBlock FontWeight="SemiBold"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Loc.Benchmark}" />
+                    <atom:Tag Text="{Binding KeyPrefix}" />
+                    <atom:Tag Text="{Binding SummaryText}" />
+                </atom:Space>
+            </DockPanel>
+        </atom:Card.Header>
+        <ScrollViewer>
+            <StackPanel Spacing="12">
+                <atom:TextBlock Opacity="0.75"
+                                TextWrapping="Wrap"
+                                Text="{Binding Loc.BenchmarkHint}" />
+                <atom:TextBlock Opacity="0.75"
+                                TextWrapping="Wrap"
+                                IsVisible="{Binding ShowClusterHint}"
+                                Text="{Binding ClusterHint}" />
+                <WrapPanel>
+                    <atom:CheckBox Content="PING"
+                                   Margin="0,0,12,4"
+                                   IsChecked="{Binding IncludePing}"
+                                   IsEnabled="{Binding CanEdit}" />
+                    <atom:CheckBox Content="SET"
+                                   Margin="0,0,12,4"
+                                   IsChecked="{Binding IncludeSet}"
+                                   IsEnabled="{Binding CanEdit}" />
+                    <atom:CheckBox Content="GET"
+                                   Margin="0,0,12,4"
+                                   IsChecked="{Binding IncludeGet}"
+                                   IsEnabled="{Binding CanEdit}" />
+                    <atom:CheckBox Content="INCR"
+                                   Margin="0,0,12,4"
+                                   IsChecked="{Binding IncludeIncr}"
+                                   IsEnabled="{Binding CanEdit}" />
+                    <atom:CheckBox Content="LPUSH+LPOP"
+                                   Margin="0,0,12,4"
+                                   IsChecked="{Binding IncludeList}"
+                                   IsEnabled="{Binding CanEdit}" />
+                    <atom:CheckBox Content="HSET"
+                                   Margin="0,0,12,4"
+                                   IsChecked="{Binding IncludeHash}"
+                                   IsEnabled="{Binding CanEdit}" />
+                </WrapPanel>
+                <UniformGrid Columns="4">
+                    <StackPanel Spacing="4">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.BenchmarkRequests}" />
+                        <atom:NumericUpDown Value="{Binding Requests}"
+                                            Minimum="1"
+                                            Maximum="1000000"
+                                            Increment="1000"
+                                            IsEnabled="{Binding CanEditRequests}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.BenchmarkConcurrency}" />
+                        <atom:NumericUpDown Value="{Binding Concurrency}"
+                                            Minimum="1"
+                                            Maximum="64"
+                                            Increment="1"
+                                            IsEnabled="{Binding CanEdit}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.BenchmarkPipeline}" />
+                        <atom:NumericUpDown Value="{Binding Pipeline}"
+                                            Minimum="1"
+                                            Maximum="1000"
+                                            Increment="1"
+                                            IsEnabled="{Binding CanEdit}" />
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <atom:TextBlock Opacity="0.75" Text="{Binding Loc.BenchmarkValueSize}" />
+                        <atom:NumericUpDown Value="{Binding ValueBytes}"
+                                            Minimum="1"
+                                            Maximum="65536"
+                                            Increment="16"
+                                            IsEnabled="{Binding CanEdit}" />
+                    </StackPanel>
+                </UniformGrid>
+                <atom:Space SizeType="Small">
+                    <atom:CheckBox Content="{Binding Loc.BenchmarkDurationMode}"
+                                   IsChecked="{Binding UseDuration}"
+                                   IsEnabled="{Binding CanEdit}" />
+                    <atom:NumericUpDown Width="120"
+                                        Value="{Binding DurationSeconds}"
+                                        Minimum="1"
+                                        Maximum="3600"
+                                        Increment="5"
+                                        IsEnabled="{Binding CanEdit}"
+                                        IsVisible="{Binding UseDuration}" />
+                    <atom:TextBlock VerticalAlignment="Center"
+                                    Opacity="0.7"
+                                    IsVisible="{Binding UseDuration}"
+                                    Text="{Binding Loc.Seconds}" />
+                </atom:Space>
+                <Grid ColumnDefinitions="*,12,*" MinHeight="180">
+                    <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                            CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                            Padding="12">
+                        <DockPanel>
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                                <atom:TextBlock FontWeight="SemiBold"
+                                                Text="{Binding Loc.BenchmarkQps}" />
+                                <atom:TextBlock DockPanel.Dock="Right"
+                                                Opacity="0.75"
+                                                HorizontalAlignment="Right"
+                                                Text="{Binding QpsText}" />
+                            </DockPanel>
+                            <controls:Sparkline Values="{Binding QpsPoints}"
+                                                Stroke="{atom:SharedTokenResource ColorPrimary}" />
+                        </DockPanel>
+                    </Border>
+                    <Border Grid.Column="2"
+                            Background="{atom:SharedTokenResource ColorFillTertiary}"
+                            CornerRadius="{atom:SharedTokenResource BorderRadiusSM}"
+                            Padding="12">
+                        <DockPanel>
+                            <atom:TextBlock DockPanel.Dock="Top"
+                                            Margin="0,0,0,8"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding Loc.BenchmarkLatency}" />
+                            <ItemsControl ItemsSource="{Binding LatencyBars}"
+                                          VerticalAlignment="Bottom">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="6"
+                                                    HorizontalAlignment="Stretch" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:BenchmarkHistogramBarViewModel">
+                                        <StackPanel Width="36" VerticalAlignment="Bottom">
+                                            <atom:TextBlock HorizontalAlignment="Center"
+                                                            FontSize="10"
+                                                            Opacity="0.7"
+                                                            Text="{Binding CountText}" />
+                                            <Border Height="{Binding Height}"
+                                                    MinHeight="2"
+                                                    Background="{atom:SharedTokenResource ColorPrimary}"
+                                                    CornerRadius="2" />
+                                            <atom:TextBlock HorizontalAlignment="Center"
+                                                            FontSize="10"
+                                                            Opacity="0.7"
+                                                            Text="{Binding Label}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+                <UniformGrid Columns="4">
+                    <atom:TextBlock Text="{Binding P50Text, StringFormat='p50 {0}'}" />
+                    <atom:TextBlock Text="{Binding P95Text, StringFormat='p95 {0}'}" />
+                    <atom:TextBlock Text="{Binding P99Text, StringFormat='p99 {0}'}" />
+                    <atom:TextBlock Text="{Binding MaxText, StringFormat='max {0}'}" />
+                </UniformGrid>
+                <atom:TextBlock Opacity="0.75" Text="{Binding ProgressText}" />
+                <atom:TextBlock Opacity="0.75"
+                                TextWrapping="Wrap"
+                                Text="{Binding StatusText}" />
+            </StackPanel>
+        </ScrollViewer>
+    </atom:Card>
+</UserControl>

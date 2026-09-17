@@ -118,6 +118,9 @@
                         <atom:MenuItem Header="{Binding Loc.LoadCurrentFolder}"
                                   Command="{Binding LoadCurrentFolderCommand}"
                                   IsVisible="{Binding ShowFolderMenu}" />
+                        <atom:MenuItem Header="{Binding Loc.AnalyzeFolder}"
+                                  Command="{Binding AnalyzeFolderCommand}"
+                                  IsVisible="{Binding ShowFolderMenu}" />
                         <atom:MenuItem Header="{Binding Loc.DeleteFolder}"
                                   Command="{Binding DeleteFolderCommand}"
                                   IsVisible="{Binding ShowFolderMenu}"

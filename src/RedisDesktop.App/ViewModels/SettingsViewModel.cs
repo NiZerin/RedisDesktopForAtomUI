@@ -246,7 +246,7 @@ public partial class SettingsViewModel : ViewModelBase
             if (AppReleaseParser.IsNewer(latest.Version, AppVersion))
             {
                 HasNewerVersion = true;
-                UpdateStatusText = Loc.T($"发现新版本 {latest.Version}", $"New version {latest.Version} is available");
+                UpdateStatusText = Loc.Format("new_version_found", "发现新版本 {0}", "New version {0} is available", latest.Version);
             }
             else
             {

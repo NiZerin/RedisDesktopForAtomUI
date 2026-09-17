@@ -39,6 +39,8 @@ macOS / Linux 可从源码自行 `dotnet publish`（见下方），暂无官方�
 - **编辑**：String、Hash、List、Set、ZSet、Stream 分页增删改；TTL；只读连接禁用写入
 - **Viewer**：Text / JSON / Hex / Gzip / Deflate / Brotli
 - **Status**：INFO 首页（版本 / 内存 / 客户端 / Keyspace），可自动刷新
+- **Slow Log / 内存分析**：连接菜单打开独立 Tab；Cluster 会扫每个 master；内存分析可暂停，也可只扫某个 Key 前缀
+- **压力测试**：独立连接（不占用浏览会话）；PING/SET/GET/INCR/List/Hash；实时 QPS 与延迟直方图；可清理 `__rdbench:` 测试 Key；只读连接禁用
 - **CLI / Pub/Sub / 命令日志**：历史与补全；订阅走独立 Tab；日志脱敏 `AUTH`，不记 `PING`
 - **更新**：启动时对照 GitHub 最新 Release；可更新 / 取消 / 不再提示；设置里仍可手动更新
 - **界面**：13 种语言；浅色 / 深色 / 跟随系统；缩放与字体；侧栏宽度退出后保持
@@ -48,7 +50,7 @@ macOS / Linux 可从源码自行 `dotnet publish`（见下方），暂无官方�
 1. 「新建连接」填写 Host / 端口，选择 Standalone、Sentinel 或 Cluster，按需打开 SSL / SSH
 2. 展开左侧连接。非 Cluster 用 DB 下拉切库，在连接内搜索、扫描 Key
 3. 右侧打开 Status。点左侧 Key 打开详情 Tab；关 Tab **不会**断开，断开请用连接右键「断开」
-4. 连接标题栏或右键打开 CLI / Pub/Sub；时钟按钮或 `Ctrl+G` 打开命令日志
+4. 连接标题栏或右键打开 CLI / Pub/Sub / 慢查询 / 内存分析 / 压力测试；时钟按钮或 `Ctrl+G` 打开命令日志
 
 | 快捷键 | 作用 |
 |--------|------|
@@ -70,7 +72,7 @@ macOS / Linux 可从源码自行 `dotnet publish`（见下方），暂无官方�
 
 ## 尚未包含
 
-Slow Log、内存分析、RedisJSON / TimeSeries / Vector 专用编辑器、自定义脚本 Viewer、DUMP 批量导入导出。CLI 目前是静态补全。`MONITOR` 已拒绝，订阅请用 Pub/Sub Tab。
+RedisJSON / TimeSeries / Vector 专用编辑器、自定义脚本 Viewer、DUMP 批量导入导出。CLI 目前是静态补全。`MONITOR` 已拒绝，订阅请用 Pub/Sub Tab。
 
 ## 从源码构建
 

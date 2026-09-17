@@ -13,6 +13,9 @@ internal sealed class RedisKeyBrowser : IKeyBrowser
     }
 
     public Task<ScanPage> ScanAsync(ScanRequest request, CancellationToken cancellationToken = default)
+        => ScanAsync(request, log: true, cancellationToken);
+
+    public Task<ScanPage> ScanAsync(ScanRequest request, bool log, CancellationToken cancellationToken = default)
     {
         return _session.RunAsync("SCAN", request.Match, async () =>
         {
@@ -31,7 +34,7 @@ internal sealed class RedisKeyBrowser : IKeyBrowser
                 .ConfigureAwait(false);
 
             return ParseScan(result);
-        }, cancellationToken);
+        }, cancellationToken, log);
     }
 
     public Task<bool> ExistsAsync(RedisKeyBytes key, CancellationToken cancellationToken = default)

@@ -2411,7 +2411,6 @@ internal static class UiCatalog
             return true;
         }
 
-        value = null;
-        return false;
+        return UiCatalogExtras.TryGet(language, key, out value);
     }
 }

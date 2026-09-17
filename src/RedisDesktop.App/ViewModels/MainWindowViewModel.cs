@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IUserPrompt _prompt;
     private readonly IThemeService _themeService;
     private readonly IAppUpdateService _updates;
+    private readonly IBenchmarkService _benchmark;
 
     public MainWindowViewModel(
         IConnectionStore connectionStore,
@@ -26,7 +27,8 @@ public partial class MainWindowViewModel : ViewModelBase
         IUserPrompt prompt,
         IThemeService themeService,
         ICommandLog commandLog,
-        IAppUpdateService updates)
+        IAppUpdateService updates,
+        IBenchmarkService benchmark)
     {
         _connectionStore = connectionStore;
         _settingsStore = settingsStore;
@@ -35,6 +37,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _prompt = prompt;
         _themeService = themeService;
         _updates = updates;
+        _benchmark = benchmark;
         Aside = new AsideViewModel(this);
         Workspace = new WorkspaceViewModel(this);
         CommandLog = new CommandLogViewModel(commandLog, this);
@@ -74,6 +77,8 @@ public partial class MainWindowViewModel : ViewModelBase
     public IUserPrompt Prompt => _prompt;
 
     public IAppUpdateService Updates => _updates;
+
+    public IBenchmarkService Benchmark => _benchmark;
 
     public int ScanCount => Math.Clamp(Settings.ScanCount <= 0 ? 200 : Settings.ScanCount, 10, 20_000);
 
@@ -389,6 +394,28 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         return Workspace.OpenPubSubAsync(item);
+    }
+
+    public Task OpenSlowLogAsync(ConnectionItemViewModel item)
+        => OpenConnectedToolAsync(item, connection => Workspace.OpenSlowLogAsync(connection));
+
+    public Task OpenMemoryAnalysisAsync(ConnectionItemViewModel item, string? prefix = null)
+        => OpenConnectedToolAsync(item, connection => Workspace.OpenMemoryAnalysisAsync(connection, prefix));
+
+    public Task OpenBenchmarkAsync(ConnectionItemViewModel item)
+        => OpenConnectedToolAsync(item, connection => Workspace.OpenBenchmarkAsync(connection));
+
+    private async Task OpenConnectedToolAsync(ConnectionItemViewModel item, Func<ConnectionItemViewModel, Task> open)
+    {
+        if (item.State != SessionState.Connected || item.Session is null)
+        {
+            await ConnectAsync(item);
+        }
+
+        if (item.Session is not null)
+        {
+            await open(item);
+        }
     }
 
     private async Task ConnectThenPubSubAsync(ConnectionItemViewModel item)

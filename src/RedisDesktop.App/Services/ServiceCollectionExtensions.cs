@@ -12,7 +12,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConnectionStore, JsonConnectionStore>();
         services.AddSingleton<IAppSettingsStore, JsonAppSettingsStore>();
         services.AddSingleton<ICommandLog, MemoryCommandLog>();
-        services.AddSingleton<IRedisSessionFactory, RedisSessionFactory>();
+        services.AddSingleton<RedisSessionFactory>();
+        services.AddSingleton<IRedisSessionFactory>(provider => provider.GetRequiredService<RedisSessionFactory>());
+        services.AddSingleton<IBenchmarkService, RedisBenchmarkService>();
         services.AddSingleton<IAppUpdateService, GitHubAppUpdateService>();
         services.AddSingleton<IUserPrompt, AtomUiUserPrompt>();
         services.AddSingleton<IThemeService, AtomUiThemeService>();

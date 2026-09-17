@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Runtime.Versioning;
 using Avalonia.Media;
+using Microsoft.Win32;
 
 namespace RedisDesktop.App;
 
@@ -250,60 +252,145 @@ public static class UiFontCatalog
             return;
         }
 
-        var fonts = new List<SystemFontInfo>();
+        var byName = new Dictionary<string, SystemFontInfo>(StringComparer.OrdinalIgnoreCase);
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void TryAdd(string? rawName, FontFamily? preview)
+        {
+            var name = SanitizeFamilyName(rawName ?? string.Empty);
+            if (string.IsNullOrWhiteSpace(name)
+                || name.StartsWith('@')
+                || name.Contains("avares:", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Default", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(name, "Default Initial", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            names.Add(name);
+            foreach (var alias in AliasesOf(name))
+            {
+                names.Add(alias);
+            }
+
+            if (byName.ContainsKey(name))
+            {
+                return;
+            }
+
+            LocalizedFamilyNames.TryGetValue(name, out var localized);
+            if (localized is null)
+            {
+                foreach (var (english, chinese) in LocalizedFamilyNames)
+                {
+                    if (string.Equals(chinese, name, StringComparison.Ordinal))
+                    {
+                        localized = english;
+                        break;
+                    }
+                }
+            }
+
+            if (string.Equals(localized, name, StringComparison.Ordinal))
+            {
+                localized = null;
+            }
+
+            byName[name] = new SystemFontInfo(name, localized, preview ?? new FontFamily(name));
+        }
+
         try
         {
             foreach (var family in FontManager.Current.SystemFonts)
             {
-                var name = family.Name?.Trim();
-                if (string.IsNullOrWhiteSpace(name)
-                    || name.StartsWith('@')
-                    || name.Contains("avares:", StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                if (!names.Add(name))
-                {
-                    continue;
-                }
-
-                foreach (var alias in AliasesOf(name))
-                {
-                    names.Add(alias);
-                }
-
-                LocalizedFamilyNames.TryGetValue(name, out var localized);
-                if (localized is null)
-                {
-                    foreach (var (english, chinese) in LocalizedFamilyNames)
-                    {
-                        if (string.Equals(chinese, name, StringComparison.Ordinal))
-                        {
-                            localized = english;
-                            break;
-                        }
-                    }
-                }
-
-                if (string.Equals(localized, name, StringComparison.Ordinal))
-                {
-                    localized = null;
-                }
-
-                fonts.Add(new SystemFontInfo(name, localized, family));
+                TryAdd(family.Name, family);
             }
         }
         catch
         {
-            // System font enumeration can fail on some platforms.
+            // Avalonia font enumeration can fail on some platforms.
         }
 
+        if (OperatingSystem.IsWindows())
+        {
+            foreach (var name in EnumerateWindowsFontFamilies())
+            {
+                TryAdd(name, null);
+            }
+        }
+
+        var fonts = byName.Values.ToList();
         fonts.Sort(static (left, right) =>
-            string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase));
+            string.Compare(left.Name, right.Name, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase));
         _systemFonts = fonts;
         _installedNames = names;
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static IEnumerable<string> EnumerateWindowsFontFamilies()
+    {
+        var results = new List<string>();
+        CollectWindowsFontKey(Registry.LocalMachine, results);
+        CollectWindowsFontKey(Registry.CurrentUser, results);
+        return results;
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void CollectWindowsFontKey(RegistryKey hive, List<string> results)
+    {
+        try
+        {
+            using var key = hive.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts");
+            if (key is null)
+            {
+                return;
+            }
+
+            foreach (var valueName in key.GetValueNames())
+            {
+                var name = StripFontRegistrySuffix(valueName);
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    results.Add(name);
+                }
+            }
+        }
+        catch
+        {
+            // Registry access can fail in locked-down environments.
+        }
+    }
+
+    private static string StripFontRegistrySuffix(string valueName)
+    {
+        var name = valueName.Trim();
+        string[] suffixes =
+        [
+            " (TrueType)",
+            " (OpenType)",
+            " (TrueType Collection)",
+            " (All res)",
+            " (VGA res)",
+            " (Plotter)",
+            " (Vector)",
+            " (PostScript)"
+        ];
+        foreach (var suffix in suffixes)
+        {
+            if (name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            {
+                name = name[..^suffix.Length].Trim();
+                break;
+            }
+        }
+
+        var amp = name.IndexOf(" & ", StringComparison.Ordinal);
+        if (amp > 0)
+        {
+            name = name[..amp].Trim();
+        }
+
+        return name;
     }
 
     private sealed record SystemFontInfo(string Name, string? LocalizedName, FontFamily Preview)

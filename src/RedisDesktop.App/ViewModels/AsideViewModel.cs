@@ -374,6 +374,8 @@ public partial class ConnectionItemViewModel : ViewModelBase, IConnectionTreeNod
 
     public bool CanWrite => IsConnected && !Config.ReadOnly;
 
+    public bool CanBenchmark => !Config.ReadOnly;
+
     public string Endpoint => FormatEndpoint(Config);
 
     public string DisplayHost => $"{Config.Host}@{Config.Port}";
@@ -400,6 +402,7 @@ public partial class ConnectionItemViewModel : ViewModelBase, IConnectionTreeNod
         OnPropertyChanged(nameof(MarkerBrush));
         OnPropertyChanged(nameof(ColorBarThickness));
         OnPropertyChanged(nameof(CanWrite));
+        OnPropertyChanged(nameof(CanBenchmark));
     }
 
     public void NotifyEndpointChanged()
@@ -546,6 +549,7 @@ public partial class ConnectionItemViewModel : ViewModelBase, IConnectionTreeNod
         OnPropertyChanged(nameof(ShowOperatePanel));
         OnPropertyChanged(nameof(ShowDatabasePicker));
         OnPropertyChanged(nameof(CanWrite));
+        OnPropertyChanged(nameof(CanBenchmark));
     }
 
     partial void OnStateChanged(SessionState value)
@@ -653,6 +657,15 @@ public partial class ConnectionItemViewModel : ViewModelBase, IConnectionTreeNod
 
     [RelayCommand]
     private Task OpenPubSubAsync() => _owner.OpenPubSubAsync(this);
+
+    [RelayCommand]
+    private Task OpenSlowLogAsync() => _owner.OpenSlowLogAsync(this);
+
+    [RelayCommand]
+    private Task OpenMemoryAnalysisAsync() => _owner.OpenMemoryAnalysisAsync(this);
+
+    [RelayCommand]
+    private Task OpenBenchmarkAsync() => _owner.OpenBenchmarkAsync(this);
 
     [RelayCommand]
     private async Task CloneAsync()

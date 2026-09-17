@@ -271,6 +271,17 @@ public partial class KeyBrowserViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private Task AnalyzeFolderAsync()
+    {
+        if (SelectedTreeNode is not { IsFolder: true } folder)
+        {
+            return Task.CompletedTask;
+        }
+
+        return _workspace.Owner.OpenMemoryAnalysisAsync(_workspace.Connection, folder.FolderPath);
+    }
+
+    [RelayCommand]
     private async Task DeleteFolderAsync()
     {
         if (!CanWrite || SelectedTreeNode is not { IsFolder: true } folder)

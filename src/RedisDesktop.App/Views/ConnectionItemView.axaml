@@ -45,6 +45,11 @@
                           IsVisible="{Binding IsDisconnected}" />
                 <atom:MenuItem Header="{Binding Loc.OpenCli}" Command="{Binding OpenCliCommand}" />
                 <atom:MenuItem Header="{Binding Loc.OpenPubSub}" Command="{Binding OpenPubSubCommand}" />
+                <atom:MenuItem Header="{Binding Loc.MemoryAnalysis}" Command="{Binding OpenMemoryAnalysisCommand}" />
+                <atom:MenuItem Header="{Binding Loc.SlowLog}" Command="{Binding OpenSlowLogCommand}" />
+                <atom:MenuItem Header="{Binding Loc.Benchmark}"
+                               Command="{Binding OpenBenchmarkCommand}"
+                               IsEnabled="{Binding CanBenchmark}" />
                 <atom:MenuItem Header="{Binding Loc.MoveToGroup}" Command="{Binding MoveToGroupCommand}" />
                 <atom:MenuItem Header="{Binding Loc.FlushDb}"
                           Command="{Binding FlushDbCommand}"
@@ -118,6 +123,16 @@
                                                Command="{Binding OpenCliCommand}" />
                                 <atom:MenuItem Header="{Binding Loc.OpenPubSub}"
                                                Command="{Binding OpenPubSubCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.MemoryAnalysis}"
+                                               Icon="{antdicons:AntDesignIconProvider BarChartOutlined}"
+                                               Command="{Binding OpenMemoryAnalysisCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.SlowLog}"
+                                               Icon="{antdicons:AntDesignIconProvider ClockCircleOutlined}"
+                                               Command="{Binding OpenSlowLogCommand}" />
+                                <atom:MenuItem Header="{Binding Loc.Benchmark}"
+                                               Icon="{antdicons:AntDesignIconProvider ThunderboltOutlined}"
+                                               Command="{Binding OpenBenchmarkCommand}"
+                                               IsEnabled="{Binding CanBenchmark}" />
                                 <atom:MenuItem Header="{Binding Loc.MoveToGroup}"
                                                Icon="{antdicons:AntDesignIconProvider FolderOutlined}"
                                                Command="{Binding MoveToGroupCommand}" />

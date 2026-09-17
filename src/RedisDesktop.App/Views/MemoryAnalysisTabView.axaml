@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.MemoryAnalysisTabView"
+             x:DataType="vm:MemoryAnalysisTabViewModel">
+    <atom:Card Margin="12" SizeType="Small">
+        <atom:Card.Header>
+            <DockPanel>
+                <atom:Space DockPanel.Dock="Right" SizeType="Small">
+                    <atom:Button Content="{Binding Loc.Restart}"
+                                 ButtonType="Primary"
+                                 IsVisible="{Binding CanRestart}"
+                                 Command="{Binding RestartCommand}" />
+                    <atom:Button Content="{Binding Loc.Pause}"
+                                 IsDanger="True"
+                                 IsVisible="{Binding CanPause}"
+                                 Command="{Binding PauseCommand}" />
+                    <atom:Button Content="{Binding Loc.Begin}"
+                                 IsVisible="{Binding CanResume}"
+                                 Command="{Binding ResumeCommand}" />
+                </atom:Space>
+                <atom:Space SizeType="Small">
+                    <atom:TextBlock FontWeight="SemiBold"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Loc.MemoryAnalysis}" />
+                    <atom:Tag Text="{Binding Prefix}"
+                              IsVisible="{Binding ShowPrefix}" />
+                    <atom:Tag Text="{Binding SummaryText}" />
+                </atom:Space>
+            </DockPanel>
+        </atom:Card.Header>
+        <DockPanel>
+            <atom:TextBlock DockPanel.Dock="Bottom"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Center"
+                            Opacity="0.75"
+                            Text="{Binding FooterText}" />
+            <atom:Space DockPanel.Dock="Top" SizeType="Small" Margin="0,0,0,8">
+                <atom:TextBlock VerticalAlignment="Center"
+                                Opacity="0.75"
+                                Text="{Binding Loc.MinSizeKb}" />
+                <NumericUpDown Width="110"
+                               Minimum="0"
+                               Maximum="1048576"
+                               Value="{Binding MinSizeKb}" />
+                <atom:TextBlock VerticalAlignment="Center"
+                                Opacity="0.7"
+                                Text="{Binding StatusText}" />
+            </atom:Space>
+            <Grid DockPanel.Dock="Top"
+                  Margin="0,0,0,8"
+                  ColumnDefinitions="56,*,120">
+                <atom:TextBlock Opacity="0.75" Text="#" />
+                <atom:Space Grid.Column="1" SizeType="Small">
+                    <atom:TextBlock FontWeight="SemiBold" Text="Key" />
+                    <atom:Tag Text="{Binding Prefix}" IsVisible="{Binding ShowPrefix}" />
+                </atom:Space>
+                <atom:HyperLinkButton Grid.Column="2"
+                                      HorizontalAlignment="Right"
+                                      Content="{Binding Loc.SizeLabel}"
+                                      Command="{Binding ToggleSizeOrderCommand}" />
+            </Grid>
+            <atom:TextBlock HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Opacity="0.7"
+                            IsVisible="{Binding ShowEmpty}"
+                            Text="{Binding Loc.EmptyKeys}" />
+            <atom:ListBox ItemsSource="{Binding Rows}"
+                          IsVisible="{Binding !ShowEmpty}"
+                          SizeType="Small"
+                          IsShowEmptyIndicator="False"
+                          DoubleTapped="OnRowDoubleTapped">
+                <atom:ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:MemoryKeyRowViewModel">
+                        <Grid ColumnDefinitions="56,*,120">
+                            <atom:TextBlock Opacity="0.55" Text="{Binding Index}" />
+                            <atom:TextBlock Grid.Column="1"
+                                            Text="{Binding Display}"
+                                            TextTrimming="CharacterEllipsis"
+                                            ToolTip.Tip="{Binding Display}" />
+                            <atom:Tag Grid.Column="2"
+                                      HorizontalAlignment="Right"
+                                      Text="{Binding SizeText}" />
+                        </Grid>
+                    </DataTemplate>
+                </atom:ListBox.ItemTemplate>
+            </atom:ListBox>
+        </DockPanel>
+    </atom:Card>
+</UserControl>

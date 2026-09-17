@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:vm="using:RedisDesktop.App.ViewModels"
+             x:Class="RedisDesktop.App.Views.SlowLogTabView"
+             x:DataType="vm:SlowLogTabViewModel">
+    <atom:Card Margin="12" SizeType="Small">
+        <atom:Card.Header>
+            <DockPanel>
+                <atom:Space DockPanel.Dock="Right" SizeType="Small">
+                    <atom:Button Content="{Binding Loc.Refresh}"
+                                 Icon="{antdicons:AntDesignIconProvider ReloadOutlined}"
+                                 Command="{Binding RefreshCommand}"
+                                 IsEnabled="{Binding !IsBusy}"
+                                 IsLoading="{Binding IsBusy}" />
+                </atom:Space>
+                <atom:Space SizeType="Small">
+                    <atom:TextBlock FontWeight="SemiBold"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Loc.SlowLog}" />
+                    <atom:TextBlock Opacity="0.7"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding StatusText}" />
+                </atom:Space>
+            </DockPanel>
+        </atom:Card.Header>
+        <DockPanel>
+            <atom:TextBlock DockPanel.Dock="Bottom"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Center"
+                            Opacity="0.75"
+                            Text="{Binding ConfigText}" />
+            <Grid DockPanel.Dock="Top"
+                  Margin="0,0,0,8"
+                  ColumnDefinitions="56,*,100,140,120,140">
+                <atom:TextBlock Opacity="0.75" Text="#" />
+                <atom:TextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding Loc.Command}" />
+                <atom:HyperLinkButton Grid.Column="2"
+                                      HorizontalAlignment="Right"
+                                      Content="{Binding Loc.Cost}"
+                                      Command="{Binding ToggleCostOrderCommand}" />
+                <atom:TextBlock Grid.Column="3"
+                                Margin="8,0,0,0"
+                                Opacity="0.75"
+                                Text="{Binding Loc.SlowLogTime}" />
+                <atom:TextBlock Grid.Column="4"
+                                Opacity="0.75"
+                                Text="{Binding Loc.SlowLogSource}" />
+                <atom:TextBlock Grid.Column="5"
+                                Opacity="0.75"
+                                IsVisible="{Binding ShowNode}"
+                                Text="{Binding Loc.Node}" />
+            </Grid>
+            <atom:TextBlock HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Opacity="0.7"
+                            IsVisible="{Binding ShowEmpty}"
+                            Text="{Binding Loc.NoSlowLog}" />
+            <atom:ListBox ItemsSource="{Binding Rows}"
+                          IsVisible="{Binding ShowRows}"
+                          SizeType="Small"
+                          IsShowEmptyIndicator="False">
+                <atom:ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SlowLogRowViewModel">
+                        <Grid ColumnDefinitions="56,*,100,140,120,140">
+                            <atom:TextBlock Opacity="0.55" Text="{Binding Id}" />
+                            <atom:TextBlock Grid.Column="1"
+                                            Text="{Binding Command}"
+                                            TextTrimming="CharacterEllipsis"
+                                            ToolTip.Tip="{Binding Command}" />
+                            <atom:Tag Grid.Column="2"
+                                      HorizontalAlignment="Right"
+                                      Text="{Binding CostText}" />
+                            <atom:TextBlock Grid.Column="3"
+                                            Margin="8,0,0,0"
+                                            Opacity="0.75"
+                                            Text="{Binding TimeOfDayText}"
+                                            ToolTip.Tip="{Binding TimeText}" />
+                            <atom:TextBlock Grid.Column="4"
+                                            TextTrimming="CharacterEllipsis"
+                                            Opacity="0.75"
+                                            Text="{Binding Source}"
+                                            ToolTip.Tip="{Binding ClientName}" />
+                            <atom:TextBlock Grid.Column="5"
+                                            TextTrimming="CharacterEllipsis"
+                                            Opacity="0.75"
+                                            Text="{Binding Node}" />
+                        </Grid>
+                    </DataTemplate>
+                </atom:ListBox.ItemTemplate>
+            </atom:ListBox>
+        </DockPanel>
+    </atom:Card>
+</UserControl>

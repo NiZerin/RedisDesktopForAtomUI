@@ -27,6 +27,8 @@ public interface IRedisSession : IAsyncDisposable
 
     IPubSubService PubSub { get; }
 
+    IObservability Observability { get; }
+
     event EventHandler<CommandLogEntry>? CommandExecuted;
 
     void SelectDatabase(int database);
@@ -47,6 +49,8 @@ public interface IRedisSession : IAsyncDisposable
 public interface IKeyBrowser
 {
     Task<ScanPage> ScanAsync(ScanRequest request, CancellationToken cancellationToken = default);
+
+    Task<ScanPage> ScanAsync(ScanRequest request, bool log, CancellationToken cancellationToken = default);
 
     Task<bool> ExistsAsync(RedisKeyBytes key, CancellationToken cancellationToken = default);
 
@@ -120,4 +124,16 @@ public interface IPubSubService
     Task UnsubscribeAsync(CancellationToken cancellationToken = default);
 
     Task PublishAsync(string channel, string message, CancellationToken cancellationToken = default);
+}
+
+public interface IObservability
+{
+    Task<IReadOnlyList<SlowLogEntry>> GetSlowLogAsync(int count = 1000, CancellationToken cancellationToken = default);
+
+    Task<SlowLogConfig> GetSlowLogConfigAsync(CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<KeyMemoryUsage>> GetMemoryUsageAsync(
+        IReadOnlyList<RedisKeyBytes> keys,
+        long minSizeBytes,
+        CancellationToken cancellationToken = default);
 }
