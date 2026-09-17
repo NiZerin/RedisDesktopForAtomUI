@@ -31,7 +31,7 @@ public interface IUserPrompt
 
     Task ShowUpdateDownloadAsync(UpdateDownloadViewModel viewModel);
 
-    Task ShowUpdateRestartNoticeAsync(string title, string message);
+    Task<bool> ShowUpdateRestartNoticeAsync(string title, string message);
 }
 
 public interface IThemeService

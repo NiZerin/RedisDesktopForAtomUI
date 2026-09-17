@@ -157,7 +157,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     public async Task<string?> PickSaveFileAsync(string title, string suggestedName)
     {
-        var window = GetMainWindow();
+        var window = GetDialogOwner();
         if (window is null)
         {
             return null;
@@ -174,7 +174,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     public async Task<string?> PickOpenFileAsync(string title)
     {
-        var window = GetMainWindow();
+        var window = GetDialogOwner();
         if (window is null)
         {
             return null;
@@ -202,12 +202,13 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     public async Task<AppUpdatePromptResult> ShowUpdateAvailableAsync(UpdateAvailableViewModel viewModel)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return AppUpdatePromptResult.Cancel;
         }
 
+        owner.Activate();
         var result = await Dialog.ShowDialogModalAsync(
             new UpdateAvailableView { DataContext = viewModel },
             viewModel,
@@ -229,12 +230,13 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     public async Task ShowUpdateDownloadAsync(UpdateDownloadViewModel viewModel)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return;
         }
 
+        owner.Activate();
         await Dialog.ShowDialogModalAsync(
             new UpdateDownloadView { DataContext = viewModel },
             viewModel,
@@ -253,34 +255,60 @@ public sealed class AtomUiUserPrompt : IUserPrompt
             owner);
     }
 
-    public async Task ShowUpdateRestartNoticeAsync(string title, string message)
+    public async Task<bool> ShowUpdateRestartNoticeAsync(string title, string message)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
-            return;
+            return false;
         }
 
-        await MessageBox.ShowMessageBoxModalAsync(
+        owner.Activate();
+        var loc = GetMainWindow()?.DataContext is MainWindowViewModel vm ? vm.Loc : null;
+        var result = await MessageBox.ShowMessageBoxModalAsync(
             new AtomTextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
             null,
             new MessageBoxOptions
             {
                 Title = title,
-                Style = MessageBoxStyle.Information,
+                Style = MessageBoxStyle.Confirm,
                 HostType = DialogHostType.Overlay,
                 IsDragMovable = true,
                 MinWidth = 420,
                 MaxWidth = 560,
-                OkButtonText = owner.DataContext is MainWindowViewModel vm ? vm.Loc.Ok : "OK"
+                OkButtonText = loc?.Ok ?? "OK",
+                CancelButtonText = loc?.Cancel ?? "Cancel"
             },
             owner);
+        return result is DialogCode.Accepted;
     }
 
     private static Avalonia.Controls.Window? GetMainWindow()
         => Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
             ? desktop.MainWindow
             : null;
+
+    private static Avalonia.Controls.Window? GetDialogOwner()
+    {
+        var owner = GetMainWindow();
+        if (owner is null)
+        {
+            return null;
+        }
+
+        for (var depth = 0; depth < 16; depth++)
+        {
+            var nested = owner.OwnedWindows.LastOrDefault(window => window.IsVisible);
+            if (nested is null)
+            {
+                break;
+            }
+
+            owner = nested;
+        }
+
+        return owner;
+    }
 
     private static void ApplyWindowSurfaces(AtomWindow window)
     {
@@ -302,7 +330,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     private static async Task<bool> ShowConnectionEditorWindowAsync(ConnectionEditorViewModel viewModel)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return false;
@@ -368,7 +396,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     private static async Task<bool> ShowNewKeyWindowAsync(NewKeyDialogViewModel viewModel)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return false;
@@ -428,7 +456,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     private static async Task<bool> ShowSettingsWindowAsync(SettingsViewModel viewModel)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return false;
@@ -487,7 +515,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
 
     private static async Task ShowCommandLogWindowAsync(CommandLogViewModel viewModel)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return;
@@ -540,7 +568,7 @@ public sealed class AtomUiUserPrompt : IUserPrompt
         bool showCancel = true,
         UiStrings? loc = null)
     {
-        var owner = GetMainWindow();
+        var owner = GetDialogOwner();
         if (owner is null)
         {
             return false;

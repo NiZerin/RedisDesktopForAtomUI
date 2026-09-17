@@ -512,11 +512,15 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
 
-        await _prompt.ShowUpdateRestartNoticeAsync(
-            Loc.UpdateAvailable,
-            Loc.T(
-                $"软件将下载 {release.Version}，并在重启后自动替换当前应用。",
-                $"The app will download {release.Version} and replace itself after restart."));
+        if (!await _prompt.ShowUpdateRestartNoticeAsync(
+                Loc.UpdateAvailable,
+                Loc.T(
+                    $"软件将下载 {release.Version}，并在重启后自动替换当前应用。",
+                    $"The app will download {release.Version} and replace itself after restart.")))
+        {
+            return;
+        }
+
         await DownloadPendingUpdateAsync(release);
     }
 
